@@ -27,5 +27,8 @@ func TestHttpGet() {
 	url := "http://www.so.com/robots.txt"
 	s := HttpGet(url)
 	fmt.Printf("HttpGet from %s :\n%s\n", url, s)
+	
+	url = "http://www.sso.com"
+	HttpGet(url)
 }
 
