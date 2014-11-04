@@ -16,6 +16,7 @@ func main() {
 //    pkg.TestInterface()
     pkg.TestAnimalInterface()
 	util.TestCallerName()
+	pkg.TestHttpGet()
 }
 
 
