@@ -28,7 +28,7 @@ func TestHttpGet() {
 	s := HttpGet(url)
 	fmt.Printf("HttpGet from %s :\n%s\n", url, s)
 	
-	url = "http://www.sso.com"
-	HttpGet(url)
+//	url = "http://www.sso.com"
+//	HttpGet(url)
 }
 
