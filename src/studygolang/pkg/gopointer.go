@@ -35,6 +35,34 @@ func TestGoPointer() {
 }
 
 func Teststring() {
-	name := "zieckey"
+	//name := "zieckey"
 	
 }
+
+func TestArray() {
+	TestArray1()
+	TestArray2()
+}
+
+func modifyArray1( args [4]int ){
+    args[1] = 100;
+}
+ 
+func TestArray1() {
+	fmt.Println()
+	var args = [4]int{1, 2, 3, 4};
+    modifyArray1(args);
+    fmt.Println(args);//输出結果是 [1 2 3 4], modifyArray1产生的效果没有保存到结果中，表面数组是按值传递的，也就是说函数参数传递时要复制一份 
+}
+
+func modifyArray2( args * [4]int ){
+    args[1] = 100;
+}
+ 
+func TestArray2() {
+	fmt.Println()
+	var args = [4]int{1, 2, 3, 4};
+    modifyArray2(&args);
+    fmt.Println(args);//输出結果是 [1 100 3 4], modifyArray2产生了效果。表面必须按照数组的指针传递 
+}
+
