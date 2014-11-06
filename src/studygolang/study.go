@@ -20,6 +20,8 @@ func main() {
 	pkg.TestGoPointer()
 	pkg.TestArray()
 	pkg.TestGobBinary()
+	pkg.TestCustomEncodeDecode()
+	pkg.TestInterfaceSerialize()
 }
 
 
