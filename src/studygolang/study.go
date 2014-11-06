@@ -19,6 +19,7 @@ func main() {
 	pkg.TestHttpGet()
 	pkg.TestGoPointer()
 	pkg.TestArray()
+	pkg.TestGobBinary()
 }
 
 
