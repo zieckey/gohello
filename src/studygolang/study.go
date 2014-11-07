@@ -23,6 +23,10 @@ func main() {
 	pkg.TestCustomEncodeDecode()
 	pkg.TestInterfaceSerialize()
 	pkg.TestReflect()
+	pkg.TestReflect2()
+	pkg.TestInterface1()
+	pkg.TestEmptyInterface2()
+	pkg.TestFileReadAndWrite()
 }
 
 
