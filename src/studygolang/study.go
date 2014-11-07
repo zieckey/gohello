@@ -22,6 +22,7 @@ func main() {
 	pkg.TestGobBinary()
 	pkg.TestCustomEncodeDecode()
 	pkg.TestInterfaceSerialize()
+	pkg.TestReflect()
 }
 
 
