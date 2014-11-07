@@ -15,7 +15,9 @@ type Quotient struct {
   Quo,Rem int
 }
 
-type Arith int
+type Arith struct {
+	
+}
 
 // 需要远程调用的方法
 func (t *Arith) Multiply(args *Args, reply *int) error {
@@ -33,6 +35,12 @@ func (t *Arith) Divide(args *Args,quo *Quotient) error {
   fmt.Printf("Divide : %v / %v = %v|%v\n",  args.A, args.B, quo.Quo, quo.Rem)
   return nil
 }
+
+func (t *Arith) HandShake(sayhi *string, resp *string) error {
+	*resp = "reponsed message: " + *sayhi
+	fmt.Printf("HandShake : %v -> [%v]\n",  *sayhi, *resp)
+	return nil
+} 
 
 func main() {
   arith := new(Arith)

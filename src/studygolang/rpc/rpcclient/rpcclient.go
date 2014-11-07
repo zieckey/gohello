@@ -35,7 +35,7 @@ func main() {
   if err != nil {
     log.Fatal("arith error:",err)
   }
-  fmt.Printf("Arith: %d*%d=%d\n",args.A,args.B,reply)
+  fmt.Printf("Arith.Multiply: %d*%d=%d\n",args.A,args.B,reply)
 
   var quot Quotient
   //远程调用，args是传给远程函数的参数，reply用来接收函数的结果
@@ -43,5 +43,15 @@ func main() {
   if err != nil {
     log.Fatal("arith error:",err)
   }
-  fmt.Printf("Arith: %d/%d=%d remainder %d\n",args.A,args.B,quot.Quo,quot.Rem)
+  fmt.Printf("Arith.Divide: %d/%d=%d remainder %d\n",args.A,args.B,quot.Quo,quot.Rem)
+  
+  
+  hi := "你好"
+  var resp string
+  //远程调用，args是传给远程函数的参数，reply用来接收函数的结果
+  err = client.Call("Arith.HandShake", hi, &resp)
+  if err != nil {
+    log.Fatal("arith error:",err)
+  }
+  fmt.Printf("Arith.HandShake: %v -> [%v]\n",  hi, resp)
 }
