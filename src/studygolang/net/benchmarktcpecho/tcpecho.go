@@ -55,7 +55,7 @@ func echoFunc(c net.Conn, stat *Stat) {
 func print(stat *Stat) {
 	for {
 		time.Sleep(1000 * time.Millisecond)
-		bytes := float64(atomic.SwapInt32(&stat.transferredBytes, 0)) / 1024.0
+		bytes := float64(atomic.SwapInt32(&stat.transferredBytes, 0))
 		msgs := float64(atomic.SwapInt32(&stat.receivedMessages, 0))
 		bytesPerMsg := 0.0
 		if msgs > 0 {
