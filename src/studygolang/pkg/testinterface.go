@@ -2,8 +2,8 @@ package pkg
 
 import (
 	"fmt"
-	"os"
 	"io"
+	"os"
 )
 
 type Person struct {
@@ -88,16 +88,16 @@ func TestInterface() {
 	/*Rain is eating noodle ...         */
 	/************************************/
 
-	//interface 查询
-	//将(子集) PeopleEat 转为 People 类型
+	// interface 查询
+	// 将(子集) PeopleEat 转为 People 类型
 	if p4, ok := p2.(People); ok {
 		p4.drink("water") //调用 People interface 中有而 PeopleEat 中没有的方法
 		fmt.Println(p4)
 	}
 	/************************************/
-	/*print result                      */
-	/*Sun is drink water ...            */
-	/*{Sun 24}                          */
+	/* print result                      */
+	/* Sun is drink water ...            */
+	/* {Sun 24}                          */
 	/************************************/
 
 	//查询 p2 是否为 Person 类型变量
@@ -164,18 +164,18 @@ func TestInterface1() {
 func TestEmptyInterface2() {
 	var r io.Reader
 	path := "test.create.file.exe"
-	tty,err := os.OpenFile(path, os.O_CREATE | os.O_TRUNC, 0)
+	tty, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0)
 	defer tty.Close()
 	if err != nil {
 		fmt.Printf("open file failed [%v] error=[%v]\n", path, err)
 		return
 	}
 	r = tty
-	
-	var w,w2 io.Writer
+
+	var w, w2 io.Writer
 	w = r.(io.Writer)
 	w2 = tty
-	
+
 	var empty interface{}
 	empty = w
 
