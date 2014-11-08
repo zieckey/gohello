@@ -1,10 +1,14 @@
 package pkg
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"os"
+)
 
 type Person struct {
 	name string
-	age int
+	age  int
 }
 
 func (p Person) printMsg() {
@@ -21,10 +25,11 @@ func (p Person) drink(s string) {
 
 type People interface {
 	printMsg()
-	PeopleEat    //组合
+	PeopleEat //组合
 	PeopleDrink
 	//eat() //不能出现重复的方法
 }
+
 /*
 //与上面等价
 type People interface {
@@ -62,43 +67,43 @@ func TestInterface() {
 	//定义一个 People interface 类型的变量p1
 	var p1 People
 	p1 = Person{"Rain", 23}
-	p1.printMsg()           //I am Rain, and my age is 23.
-	p1.drink("orange juice")//print result: Rain is drinking orange juice
+	p1.printMsg()            //I am Rain, and my age is 23.
+	p1.drink("orange juice") //print result: Rain is drinking orange juice
 
 	//同一类可以属于多个 interface, 只要这个类实现了这个 interface中的方法
 	var p2 PeopleEat
 	p2 = Person{"Sun", 24}
-	p2.eat("chaffy dish")//print result: Sun is eating chaffy dish ...
+	p2.eat("chaffy dish") //print result: Sun is eating chaffy dish ...
 
 	//不同类也可以实现同一个 interface
 	var p3 PeopleEat
 	p3 = Foodie{"James"}
-	p3.eat("noodle")//print result: I am foodie, James. My favorite food is the noodle
+	p3.eat("noodle") //print result: I am foodie, James. My favorite food is the noodle
 
 	//interface 赋值
-	p3 = p1  //p3 中的方法会被 p1 中的覆盖
+	p3 = p1 //p3 中的方法会被 p1 中的覆盖
 	p3.eat("noodle")
 	/************************************/
 	/*print result                      */
 	/*Rain is eating noodle ...         */
 	/************************************/
 
-	//interface 查询
-	//将(子集) PeopleEat 转为 People 类型
+	// interface 查询
+	// 将(子集) PeopleEat 转为 People 类型
 	if p4, ok := p2.(People); ok {
 		p4.drink("water") //调用 People interface 中有而 PeopleEat 中没有的方法
 		fmt.Println(p4)
 	}
 	/************************************/
-	/*print result                      */
-	/*Sun is drink water ...            */
-	/*{Sun 24}                          */
+	/* print result                      */
+	/* Sun is drink water ...            */
+	/* {Sun 24}                          */
 	/************************************/
 
 	//查询 p2 是否为 Person 类型变量
 	if p5, ok := p2.(Person); ok {
 		fmt.Println(p5, "type is Person")
-		p5.drink("***")  //此时也可以调用 Person 所有的方法
+		p5.drink("***") //此时也可以调用 Person 所有的方法
 	}
 	/************************************/
 	/*print result                      */
@@ -121,3 +126,58 @@ func TestInterface() {
 	//result: {Tom} type is Foodie
 }
 
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+type UUser struct {
+	Id   int
+	Name string
+}
+
+type Tester interface {
+	Test()
+}
+
+func (this *UUser) Test() {
+	fmt.Println(&this)
+}
+func t11() Tester {
+	var x *UUser = nil
+	return x
+}
+
+func TestInterface1() {
+	var t Tester = &UUser{1, "Tom"}
+	if x := t11(); x == nil {
+		fmt.Println("t11() return nil") // 此值不输出
+	} else {
+		fmt.Printf("t11() return not nil, it is [%v]\n", x) // TODO 这里是为什么，返回的难度是interface nil？？？？？？
+	}
+	fmt.Println(t)
+}
+
+//////////////////////////////////////////
+
+func TestEmptyInterface2() {
+	var r io.Reader
+	path := "test.create.file.exe"
+	tty, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0)
+	defer tty.Close()
+	if err != nil {
+		fmt.Printf("open file failed [%v] error=[%v]\n", path, err)
+		return
+	}
+	r = tty
+
+	var w, w2 io.Writer
+	w = r.(io.Writer)
+	w2 = tty
+
+	var empty interface{}
+	empty = w
+
+	fmt.Printf("interface empty=[%#v] w=[%#v] w2=[%#v] r=[%#v]\n", empty, w, w2, r)
+}

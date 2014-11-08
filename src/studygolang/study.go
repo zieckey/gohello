@@ -19,6 +19,13 @@ func main() {
 	pkg.TestHttpGet()
 	pkg.TestGoPointer()
 	pkg.TestArray()
+	pkg.TestGobBinary()
+	pkg.TestCustomEncodeDecode()
+	pkg.TestInterfaceSerialize()
+	pkg.TestInterface1()
+	pkg.TestEmptyInterface2()
+	pkg.TestFileReadAndWrite()
+	pkg.TestReflect()
 }
 
 
