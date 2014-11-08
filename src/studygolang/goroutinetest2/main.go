@@ -1,4 +1,4 @@
-package goroutinetest2
+package main
 
 import "os"
 
