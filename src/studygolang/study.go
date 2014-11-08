@@ -27,6 +27,7 @@ func main() {
 	pkg.TestInterface1()
 	pkg.TestEmptyInterface2()
 	pkg.TestFileReadAndWrite()
+	pkg.TestReflectTypeOfValueOf()
 }
 
 
