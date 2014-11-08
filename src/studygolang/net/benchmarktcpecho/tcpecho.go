@@ -31,6 +31,7 @@ func main() {
 			continue
 		}
 
+		atomic.AddInt32(&stat.connections, 1)
 		go echoFunc(conn, stat)
 	}
 }
@@ -46,6 +47,8 @@ func echoFunc(c net.Conn, stat *Stat) {
 		}
 
 		c.Write(buf[:n])
+		atomic.AddInt32(&stat.transferredBytes, int32(n))
+		atomic.AddInt32(&stat.receivedMessages, 1)
 	}
 }
 
