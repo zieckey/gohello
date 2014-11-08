@@ -22,12 +22,10 @@ func main() {
 	pkg.TestGobBinary()
 	pkg.TestCustomEncodeDecode()
 	pkg.TestInterfaceSerialize()
-	pkg.TestReflect()
-	pkg.TestReflect2()
 	pkg.TestInterface1()
 	pkg.TestEmptyInterface2()
 	pkg.TestFileReadAndWrite()
-	pkg.TestReflectTypeOfValueOf()
+	pkg.TestReflect()
 }
 
 

@@ -163,7 +163,7 @@ func TestInterface1() {
 
 func TestEmptyInterface2() {
 	var r io.Reader
-	path := "aaa.txt"
+	path := "test.create.file.exe"
 	tty,err := os.OpenFile(path, os.O_CREATE | os.O_TRUNC, 0)
 	defer tty.Close()
 	if err != nil {

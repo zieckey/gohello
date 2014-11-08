@@ -1,12 +1,20 @@
 package pkg
 
 import (
+	"encoding/xml"
 	"fmt"
 	"reflect"
-	"encoding/xml"
 )
 
 func TestReflect() {
+	TestReflect1()
+	TestReflect2()
+	TestReflect3()
+	TestReflect4()
+	TestReflect5()
+}
+
+func TestReflect1() {
 
 	type T struct {
 		A int
@@ -21,71 +29,85 @@ func TestReflect() {
 	}
 }
 
-
 /////////////////////////////////////////
 
-type st struct{
+type st struct {
 }
 
-func (this *st)Echo(){
-    fmt.Println("echo()")
+func (this *st) Echo() {
+	fmt.Println("echo()")
 }
 
-func (this *st)Echo2(){
-    fmt.Println("echo--------------------()")
+func (this *st) Echo2() {
+	fmt.Println("echo--------------------()")
 }
 
-var xmlstr string=`<root>
+var xmlstr string = `<root>
 <func>Echo</func>
 <func>Echo2</func>
 </root>`
 
-type st2 struct{
-    E []string `xml:"func"`
+type st2 struct {
+	E []string `xml:"func"`
 }
 
 //TODO 不太懂？？？？
-//利用golang的反射包，实现根据函数名自动调用函数。  
+//利用golang的反射包，实现根据函数名自动调用函数。
 func TestReflect2() {
-    s2 := st2{}
-    xml.Unmarshal([]byte(xmlstr), &s2)
+	s2 := st2{}
+	xml.Unmarshal([]byte(xmlstr), &s2)
 
-    s := &st{}
-    v := reflect.ValueOf(s)
-  
-    v.MethodByName(s2.E[1]).Call(nil)
- }
+	s := &st{}
+	v := reflect.ValueOf(s)
 
-
+	v.MethodByName(s2.E[1]).Call(nil)
+}
 
 //////////////////////////////////////////////////////////
-type MyStruct struct{
-    name string
+type MyStruct struct {
+	name string
 }
- 
-func (this *MyStruct)GetName() string {
-    return this.name
+
+func (this *MyStruct) GetName() string {
+	return this.name
 }
- 
-func TestReflectTypeOfValueOf() {
+
+
+func TestReflect3() {
 	fmt.Println("\n")
-    s := "this is string"
-    fmt.Println(reflect.TypeOf(s))
-    fmt.Println("-------------------")
-     
-    fmt.Println(reflect.ValueOf(s))
-    var x float64 = 3.4
-    fmt.Println(reflect.ValueOf(x))
-    fmt.Println("-------------------")
-     
-    a := new(MyStruct)
-    a.name = "yejianfeng"
-    typ := reflect.TypeOf(a)
- 
-    fmt.Println(typ.NumMethod())
-    fmt.Println("-------------------")
-     
-    b := reflect.ValueOf(a).MethodByName("GetName").Call([]reflect.Value{})
-    fmt.Println(b[0])
- 
+	s := "this is string"
+	fmt.Println(reflect.TypeOf(s))
+	fmt.Println("-------------------")
+
+	fmt.Println(reflect.ValueOf(s))
+	var x float64 = 3.4
+	fmt.Println(reflect.ValueOf(x))
+	fmt.Println("-------------------")
+
+	a := new(MyStruct)
+	a.name = "yejianfeng"
+	typ := reflect.TypeOf(a)
+
+	fmt.Println(typ.NumMethod())
+	fmt.Println("-------------------")
+
+	b := reflect.ValueOf(a).MethodByName("GetName").Call([]reflect.Value{})
+	fmt.Println(b[0])
+}
+
+////////////////////////////////////////////////////
+func TestReflect4() {
+	fmt.Printf("\n\n")
+	var x float64 = 3.4
+	fmt.Println("type:", reflect.TypeOf(x))   //这个程序打印    type: float64
+	fmt.Println("value:", reflect.ValueOf(x)) //这个程序打印    value: <float64 Value>
+}
+
+func TestReflect5() {
+	fmt.Printf("\n\n")
+	var x float64 = 3.4
+	v := reflect.ValueOf(x)
+	fmt.Println("type:", v.Type())
+	fmt.Println("kind is float64:", v.Kind() == reflect.Float64)
+	fmt.Println("value:", v.Float())
 }
