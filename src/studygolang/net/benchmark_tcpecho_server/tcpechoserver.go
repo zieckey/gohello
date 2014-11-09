@@ -42,6 +42,7 @@ func echoFunc(c net.Conn, stat *Stat) {
 	for {
 		n, err := c.Read(buf)
 		if n == 0 {
+			// the peer has performed an orderly shutdown
 			atomic.AddInt32(&stat.connections, -1)
 			return
 		}
