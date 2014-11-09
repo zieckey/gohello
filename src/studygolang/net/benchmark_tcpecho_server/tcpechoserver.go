@@ -4,8 +4,8 @@ import (
 	"flag"
 	"log"
 	"net"
-	"time"
 	"sync/atomic"
+	"time"
 )
 
 type Stat struct {
@@ -41,11 +41,14 @@ func echoFunc(c net.Conn, stat *Stat) {
 
 	for {
 		n, err := c.Read(buf)
+		if n == 0 {
+			atomic.AddInt32(&stat.connections, -1)
+			return
+		}
 		if err != nil {
 			log.Println(err)
 			return
 		}
-
 		c.Write(buf[:n])
 		atomic.AddInt32(&stat.transferredBytes, int32(n))
 		atomic.AddInt32(&stat.receivedMessages, 1)
