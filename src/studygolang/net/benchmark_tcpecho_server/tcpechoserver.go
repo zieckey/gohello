@@ -37,7 +37,7 @@ func main() {
 }
 
 func echoFunc(c net.Conn, stat *Stat) {
-	buf := make([]byte, 1024)
+	buf := make([]byte, 1024*128)
 
 	for {
 		n, err := c.Read(buf)
