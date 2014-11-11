@@ -1,8 +1,0 @@
-package tutorial;
-
-message RegMessage {
-    required int32 id = 1;
-    required string username = 2;
-    required string password = 3;
-    optional string email = 4;
-}
