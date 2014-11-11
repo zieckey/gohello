@@ -26,6 +26,7 @@ func main() {
 	pkg.TestEmptyInterface2()
 	pkg.TestFileReadAndWrite()
 	pkg.TestReflect()
+	pkg.TestJSON()
 }
 
 
