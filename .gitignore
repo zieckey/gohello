@@ -2,3 +2,4 @@
 *.exe~
 *.a
 src/go.tools
+bin/*

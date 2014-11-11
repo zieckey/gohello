@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var localIpPort = flag.String("localIp", "0.0.0.0:0", "The local ip address and port to bind")
+var localIpPort = flag.String("localIpPort", "0.0.0.0:0", "The local ip address and port to bind")
 var localIpCount = flag.Int("localIpCount", 1, "The total count of local ip")
 var connPerIp = flag.Int("connPerIp", 1, "The concurrent connection count for every local ip")
 var serverIpPort = flag.String("serverIpPort", "127.0.0.1:2007", "The tcp server ip address and listening port")
@@ -21,7 +21,12 @@ func main() {
 	flag.Parse()
 	for ipIndex := 0; ipIndex < *localIpCount; ipIndex++ {
 		for i := 0; i < *connPerIp; i++ {
-			go connect(*serverIpPort, *localIpPort, *messageLen, *sleepIntervalMs)
+			lipp := *localIpPort
+			if lipp != "0.0.0.0:0" {
+				lipp = calcIpPort(lipp, ipIndex, i)
+			}
+			fmt.Printf("local ip port [%v]\n", lipp)
+			go connect(*serverIpPort, lipp, *messageLen, *sleepIntervalMs)
 		}
 	}
 	ch := make(chan int)
@@ -68,12 +73,14 @@ func connect(serverIpPort string, localIpPort string, messageLen int, sleepInter
 
 // 根据index计算当前ip的下一个IP
 // 例如输入 "192.168.0.150:80", ipIndex=2 ===> "192.168.0.152:80"
-func calcIpPort(ipPort string, ipIndex int) string {
+func calcIpPort(ipPort string, ipIndex int, portIndex int) string {
 	spp := strings.Split(ipPort, ":")
+	a, _ := strconv.Atoi(string(spp[1]))
+	port := strconv.Itoa(a + portIndex)
 	dotip := strings.Split(spp[0], ".")
-	a, _ := strconv.Atoi(string(dotip[3]))
+	a, _ = strconv.Atoi(string(dotip[3]))
 	next := strconv.Itoa(a + ipIndex)
-	r := dotip[0] + "." + dotip[1] + "." + dotip[2] + "." + next + ":" + spp[1]
+	r := dotip[0] + "." + dotip[1] + "." + dotip[2] + "." + next + ":" + port
 	fmt.Printf("input ip=%v index=%v  ===> next ip=%v\n", ipPort, ipIndex, r)
 	return r
 }
