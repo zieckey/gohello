@@ -27,6 +27,7 @@ func main() {
 	pkg.TestFileReadAndWrite()
 	pkg.TestReflect()
 	pkg.TestJSON()
+	pkg.TestGoSimpleJSON()
 }
 
 
