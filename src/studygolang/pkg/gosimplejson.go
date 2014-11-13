@@ -49,13 +49,14 @@ func TestGoSimpleJSON() {
 	obja := js.Get("obj").Get("a").MustInt()
 	objb := js.GetPath("obj", "B").MustString()
 	objc := js.GetPath("obj", "c").MustString()
+	cname := js.GetPath("obj", "c", "cname").MustString()
 	
 	//获取JSONArray中的元素
 	employees := js.Get("employees")
 	obj1 := employees.GetIndex(0)
 	obj1firstName := obj1.Get("firstName").MustString()
 	
-    fmt.Printf("total=[%v] dept=[%v] a=[%v] b=[%v] c=[%v] obj1firstName=[%v]", total, dept, obja, objb, objc, obj1firstName)
+    fmt.Printf("total=[%v] dept=[%v] a=[%v] b=[%v] c=[%v] cname=[%v] obj1firstName=[%v]", total, dept, obja, objb, objc, cname, obj1firstName)
 }
 
 
