@@ -2,8 +2,8 @@ package main
 
 import "fmt"
 import "math"
-import "studygolang/pkg"
-import "studygolang/util"
+import "github.com/zieckey/gohello/studygolang/pkg"
+import "github.com/zieckey/gohello/studygolang/util"
 
 
 func main() {

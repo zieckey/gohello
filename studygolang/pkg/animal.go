@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"fmt"
-	"studygolang/util"
+	"github.com/zieckey/gohello/studygolang/util"
 )
 
 type Animal interface {

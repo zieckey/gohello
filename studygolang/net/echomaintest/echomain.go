@@ -1,7 +1,7 @@
 package main 
 
 import (
-	"studygolang/net"
+	"github.com/zieckey/gohello/studygolang/net"
 )
 
 func main() {
