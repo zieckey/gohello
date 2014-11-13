@@ -7,13 +7,13 @@ import "github.com/zieckey/gohello/studygolang/util"
 
 
 func main() {
-//    StudyForLoop()
+    StudyForLoop()
     FizzBuzzConstIfElse()
-//    StringFunc()
-//    StringRune()
-//    TestDefer()
-//    TestPanicRecover()
-//    pkg.TestInterface()
+    StringFunc()
+    StringRune()
+    TestDefer()
+    TestPanicRecover()
+    pkg.TestInterface()
     pkg.TestAnimalInterface()
 	util.TestCallerName()
 	pkg.TestHttpGet()

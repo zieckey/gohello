@@ -8,9 +8,12 @@ import (
 
 func TestFileReadAndWrite() {
 
-	path := "TestFileReadAndWrite.exe"
+	path := "tmp/TestFileReadAndWrite.exe"
 	tty, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0)
-	defer tty.Close()
+	defer func() {
+		tty.Close()
+		os.Remove(path)
+	}()
 	if err != nil {
 		fmt.Printf("open file failed [%v] error=[%v]\n", path, err)
 		return
