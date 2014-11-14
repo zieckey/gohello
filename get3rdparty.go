@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	cmds := [...]string{"go get github.com/bitly/go-simplejson"}
+	cmds := [...]string{"go get github.com/bitly/go-simplejson", "code.google.com/p/goprotobuf"}
 
 	for i := 0; i < len(cmds); i++ {
 		cmd := cmds[i]
