@@ -28,10 +28,8 @@ func main() {
 	pkg.TestReflect()
 	pkg.TestJSON()
 	pkg.TestGoSimpleJSON()
+	pkg.TestExec_date()
 }
-
-
-
 
 
 func StudyForLoop() {
