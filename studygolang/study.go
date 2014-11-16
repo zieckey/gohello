@@ -30,6 +30,7 @@ func main() {
 	pkg.TestGoSimpleJSON()
 	pkg.TestExec_date()
 	pkg.TestMap()
+	pkg.TestVariableNumberArguments()
 }
 
 
