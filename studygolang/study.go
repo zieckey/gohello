@@ -31,6 +31,7 @@ func main() {
 	pkg.TestExec_date()
 	pkg.TestMap()
 	pkg.TestVariableNumberArguments()
+	pkg.TestMd5()
 }
 
 
