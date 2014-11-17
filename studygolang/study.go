@@ -33,6 +33,8 @@ func main() {
 	pkg.TestMap()
 	pkg.TestVariableNumberArguments()
 	pkg.TestMd5()
+	pkg.TestGoSimpleJSONUnicode()
+	pkg.TestJSONUnicode()
 }
 
 
