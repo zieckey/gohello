@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -39,4 +40,12 @@ func TestFileReadAndWrite() {
 
 	s = string(buf)
 	fmt.Printf("readn=%d s.len=%d content:[%s]\n", n, len(s), s)
+}
+
+func TestWriteFile() {
+	filepath := "testfile.dat"
+	ioutil.WriteFile(filepath, []byte("hello"), 0755)
+	defer func() {
+		os.Remove(filepath)
+	}()
 }
