@@ -3,3 +3,4 @@
 *.a
 src/go.tools
 bin/*
+benchmark/httpecho/httpecho
