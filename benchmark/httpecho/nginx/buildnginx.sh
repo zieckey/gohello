@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 WORKDIR=`pwd`
+NGINXINSTALL=$WORKDIR/nginx
 
 #get echo-nginx-module
 git clone https://github.com/openresty/echo-nginx-module
@@ -11,9 +12,10 @@ tar -xzvf nginx-1.7.4.tar.gz
 cd nginx-1.7.4/
 
 # Here we assume you would install you nginx under /opt/nginx/.
-./configure --prefix=$WORKDIR/nginx --add-module=$WORKDIR/echo-nginx-module
+./configure --prefix=$NGINXINSTALL --add-module=$WORKDIR/echo-nginx-module
 
 make -j2
 make install
 
-cp nginx.conf nginx/conf/
+cd -
+cp nginx.conf $NGINXINSTALL/conf/
