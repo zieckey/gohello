@@ -12,6 +12,7 @@ func TestReflect() {
 	TestReflect3()
 	TestReflect4()
 	TestReflect5()
+	TestReflect6()
 }
 
 func TestReflect1() {
@@ -110,4 +111,15 @@ func TestReflect5() {
 	fmt.Println("type:", v.Type())
 	fmt.Println("kind is float64:", v.Kind() == reflect.Float64)
 	fmt.Println("value:", v.Float())
+}
+
+func TestReflect6() {
+	fmt.Printf("\n\n\nTestReflect6:\n")
+	var x float64 = 3.4
+	v := reflect.ValueOf(x)
+	t := reflect.TypeOf(x)
+	fmt.Println("reflect.ValueOf(x).type:", v.Type())
+	fmt.Println("reflect.ValueOf(x).kind is float64:", v.Kind() == reflect.Float64)
+	fmt.Println("reflect.ValueOf(x).value:", v.Float())
+	fmt.Println("reflect.TypeOf(x):", t)
 }
