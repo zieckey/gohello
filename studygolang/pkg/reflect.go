@@ -13,6 +13,7 @@ func TestReflect() {
 	TestReflect4()
 	TestReflect5()
 	TestReflect6()
+	TestReflect7()
 }
 
 func TestReflect1() {
@@ -122,4 +123,33 @@ func TestReflect6() {
 	fmt.Println("reflect.ValueOf(x).kind is float64:", v.Kind() == reflect.Float64)
 	fmt.Println("reflect.ValueOf(x).value:", v.Float())
 	fmt.Println("reflect.TypeOf(x):", t)
+}
+
+
+///////////////////////////////////////////////////////////////
+
+func TestReflect7() {
+    fmt.Println("\n\n--------------\nTestReflect7\n")
+    var a MyStruct
+    b := new(MyStruct)
+    fmt.Println(reflect.ValueOf(a)) //<pkg.MyStruct Value>
+    fmt.Println(reflect.ValueOf(b)) //<*pkg.MyStruct Value>
+     
+    fmt.Println("--------------")
+    a.name = "yejianfeng"
+    b.name = "yejianfeng"
+    val := reflect.ValueOf(a).FieldByName("name")
+    fmt.Println(val)	// yejianfeng
+ 
+    fmt.Println("--------------")
+    fmt.Println(reflect.ValueOf(a).FieldByName("name").CanSet())
+    fmt.Println(reflect.ValueOf(&(a.name)).Elem().CanSet())
+     
+    fmt.Println("--------------")
+    var c string = "yejianfeng"
+    p := reflect.ValueOf(&c)
+    fmt.Println(p.CanSet())   //false
+    fmt.Println(p.Elem().CanSet())  //true
+    p.Elem().SetString("newName")
+    fmt.Println(c)
 }
