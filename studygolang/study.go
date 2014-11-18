@@ -36,6 +36,7 @@ func main() {
 	pkg.TestGoSimpleJSONUnicode()
 	pkg.TestJSONUnicode()
 	pkg.TestEmptyInterface3()
+	pkg.TestUnicodeRune()
 }
 
 
