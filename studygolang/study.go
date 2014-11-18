@@ -35,6 +35,7 @@ func main() {
 	pkg.TestMd5()
 	pkg.TestGoSimpleJSONUnicode()
 	pkg.TestJSONUnicode()
+	pkg.TestEmptyInterface3()
 }
 
 

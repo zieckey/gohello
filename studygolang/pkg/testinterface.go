@@ -184,3 +184,38 @@ func TestEmptyInterface2() {
 
 	fmt.Printf("interface empty=[%#v] w=[%#v] w2=[%#v] r=[%#v]\n", empty, w, w2, r)
 }
+
+func TestEmptyInterface3() {
+	type Any interface{}
+	var i = 5
+	var str = "abc"
+	var val Any
+	val = i
+	fmt.Printf("val has the value: %v\n", val)
+	val = str
+	fmt.Printf("val has the value: %v\n", val)
+	pers1 := new(Person)
+	pers1.name = "Rob Pike"
+	pers1.age = 55
+	val = pers1
+	fmt.Printf("val has the value: %v\n", val)
+	switch t := val.(type) {
+	case int:
+		fmt.Printf("Type int %T\n", t)
+	case string:
+		fmt.Printf("Type string %T\n", t)
+	case bool:
+		fmt.Printf("Type boolean %T\n", t)
+	case *Person:
+		fmt.Printf("Type pointer to Person %T\n", *t)
+	default:
+		fmt.Printf("Unexpected type %T", t)
+	}
+
+	/*
+		Output: val has the value: 5
+		val has the value: ABC
+		val has the value: &{Rob Pike 55}
+		Type pointer to Person main.Person
+	*/
+}
