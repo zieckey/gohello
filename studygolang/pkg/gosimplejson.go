@@ -85,6 +85,7 @@ func TestGoSimpleJSONUnicode() {
     "total": 123,
     "dept": "server_dev",
     "addr": "洛杉矶",
+    "text" : "\u0422\u0443\u043b\u0430",
     "obj": {
         "a": 1,
         "B": "bbb",
@@ -102,6 +103,7 @@ func TestGoSimpleJSONUnicode() {
         log.Fatalln(err)
     }
 
+	text := js.Get("text").MustString()
 	addr := js.Get("addr").MustString()
 	addrBase64 := base64.StdEncoding.EncodeToString([]byte(addr))
     total := js.Get("total").MustInt()
@@ -116,7 +118,7 @@ func TestGoSimpleJSONUnicode() {
 	obj1 := employees.GetIndex(0)
 	obj1firstName := obj1.Get("firstName").MustString()
 	
-    fmt.Printf("addr=[%v] [%v] total=[%v] dept=[%v] a=[%v] b=[%v] c=[%v] cname=[%v] obj1firstName=[%v]", addr, addrBase64, total, dept, obja, objb, objc, cname, obj1firstName)
+    fmt.Printf("addr=[%v] [%v] text=[%v] total=[%v] dept=[%v] a=[%v] b=[%v] c=[%v] cname=[%v] obj1firstName=[%v]", addr, addrBase64, text, total, dept, obja, objb, objc, cname, obj1firstName)
     
     str, err := js.Encode()
     pretty, err := js.EncodePretty()
