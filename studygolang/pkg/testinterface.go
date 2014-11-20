@@ -16,11 +16,11 @@ func (p Person) printMsg() {
 }
 
 func (p Person) eat(s string) {
-	fmt.Printf("%s is eating %s ...\n", p.name, s)
+	fmt.Printf("Person %s is eating %s ...\n", p.name, s)
 }
 
 func (p Person) drink(s string) {
-	fmt.Printf("%s is drinking %s ...\n", p.name, s)
+	fmt.Printf("Person %s is drinking %s ...\n", p.name, s)
 }
 
 type People interface {

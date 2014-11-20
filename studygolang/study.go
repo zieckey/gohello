@@ -39,6 +39,7 @@ func main() {
 	pkg.TestHMAC()
 	pkg.TestMD5HMAC()
 	pkg.Testappend()
+	pkg.TestDerive()
 }
 
 
