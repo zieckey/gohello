@@ -20,6 +20,11 @@ type tunnel struct {
 	reply io.Writer
 }
 
+type xsocket struct {
+	net.Conn
+	* sync.Mutex
+}
+
 type bundle struct {
 	t [maxConn] tunnel
 	* list.List
@@ -27,10 +32,6 @@ type bundle struct {
 	sync.Mutex
 }
 
-type xsocket struct {
-	net.Conn
-	* sync.Mutex
-}
 
 func (s xsocket) Read(data []byte) (n int, err error) {
 	n,err = io.ReadFull(s.Conn, data)
