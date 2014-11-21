@@ -10,7 +10,6 @@ func main() {
     pkg.FizzBuzzConstIfElse()
     pkg.StringFunc()
     pkg.StringRune()
-    pkg.TestDefer()
     pkg.TestPanicRecover()
     pkg.TestInterface()
     pkg.TestAnimalInterface()
@@ -40,6 +39,7 @@ func main() {
 	pkg.TestMD5HMAC()
 	pkg.Testappend()
 	pkg.TestDerive()
+    pkg.TestDefer()
 }
 
 

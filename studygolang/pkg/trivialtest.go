@@ -88,13 +88,6 @@ func StringRune() {
 	}
 }
 
-func TestDefer() {
-	fmt.Printf("\n\nTestDefer")
-	for i := 0; i < 5; i++ {
-		defer fmt.Printf(" i=%v", i)
-	}
-}
-
 func ConvertInt64ToInt(x int64) int{
 	if math.MinInt32<=x && x<=math.MaxInt32 {
 		return int(x)
