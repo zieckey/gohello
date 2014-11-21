@@ -564,7 +564,6 @@ func TestHMAC() {
 	}
 }
 
-func myhmac(key, data []byte, h func() hash.Hash) []byte {
 /* take it from php doc :
 function hmac ($key, $data)
  {
@@ -586,6 +585,7 @@ function hmac ($key, $data)
      return md5($k_opad  . pack("H*",md5($k_ipad . $data)));
  }
 */	
+func myhmac(key, data []byte, h func() hash.Hash) []byte {
 	mh := h()
 	b := mh.BlockSize()
 	if len(key) > b {
@@ -594,12 +594,8 @@ function hmac ($key, $data)
 		mh.Reset()
 	}
 	
-	//fmt.Printf("blocksize=%v key=[%v]\n", b, key)
-	
 	bkey := make([]byte, b)
 	copy(bkey, key)
-	
-	//fmt.Printf("blocksize=%v bkey=[%v]\n", b, bkey)
 	
 	kipad := make([]byte, b)
 	kopad := make([]byte, b)
@@ -612,8 +608,6 @@ function hmac ($key, $data)
 	mh.Write(data)
 	bin := mh.Sum(nil)
 	mh.Reset()
-	
-	//fmt.Printf("blocksize=%v inner binary hash=[%v]\n", b, bin)
 	
 	mh.Write(kopad)
 	mh.Write(bin)
