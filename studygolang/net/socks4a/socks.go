@@ -16,7 +16,8 @@ const maxConn = 0x10000
 type Tunnel struct {
 	lconn net.Conn // the connection from local app
 	rconn net.Conn // the connection to remote server
-	lbuf  *bufio.Reader
+	lbuf  *bufio.Reader // refactor : don't use this buffered io
+	//closed bool
 }
 
 func socks4a(ipBuf []byte) bool {
@@ -37,12 +38,15 @@ func servRemoteTunnel(t *Tunnel) {
 		log.Printf("read %v bytes from remote server %v [%v]", n, t.rconn.RemoteAddr(), string(buf))
 		if n == 0 {
 			t.lconn.Close()
+			t.rconn.Close()
 			return
 		}
+		
 		if err != nil {
 			log.Printf("Read from remote server %v", err)
-			continue
+			return
 		}
+
 		t.lconn.Write(buf[:n])
 	}
 }
