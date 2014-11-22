@@ -17,7 +17,7 @@ type tunnel struct {
 	id int
 	* list.Element
 	send chan []byte
-	reply io.Writer
+	reply io.Writer	// The socket to remote server(xtunneld)
 }
 
 type xsocket struct {
@@ -25,14 +25,15 @@ type xsocket struct {
 	* sync.Mutex
 }
 
+// it is a singleton instance.
 type bundle struct {
 	t [maxConn] tunnel
 	* list.List
-	* xsocket
+	* xsocket	//The socket to remote server(xtunneld)
 	sync.Mutex
 }
 
-
+// Read reads data from remte server(xtunneld)
 func (s xsocket) Read(data []byte) (n int, err error) {
 	n,err = io.ReadFull(s.Conn, data)
 	if n>0 {
@@ -44,6 +45,7 @@ func (s xsocket) Read(data []byte) (n int, err error) {
 	return
 }
 
+// Write write data to remte server(xtunneld)
 func (s xsocket) Write(data []byte) (n int, err error) {
 	s.Lock()
 	defer s.Unlock()
@@ -87,6 +89,7 @@ func (t *tunnel) processBack(c net.Conn) {
 	}
 }
 
+// 向远端server(xtunneld)发送关闭消息
 func (t *tunnel) sendClose() {
 	buf := [4]byte {
 		byte(t.id>>8),
@@ -97,6 +100,7 @@ func (t *tunnel) sendClose() {
 	t.reply.Write(buf[:])
 }
 
+// 向远端server(xtunneld)发送数据包(已经加密)
 func (t *tunnel) sendBack(buf []byte) {
 	buf[0] = byte(t.id>>8)
 	buf[1] = byte(t.id & 0xff)
@@ -106,10 +110,14 @@ func (t *tunnel) sendBack(buf []byte) {
 	t.reply.Write(buf)
 }
 
+
 func (t *tunnel) process(c net.Conn,b *bundle) {
-	go t.processBack(c)
-	send := t.send
 	
+	// 从应用程序读取数据，发送给远端server(xtunneld)
+	go t.processBack(c)
+	
+	// 从远端server(xtunneld)读取到数据，发送回应用程序	
+	send := t.send
 	for {
 		buf,ok := <-send 
 		if !ok {
@@ -147,6 +155,7 @@ func newBundle(c net.Conn) *bundle {
 	return b
 }
 
+// c - 普通程序与本地xtunnel建立的连接
 func (b *bundle) alloc(c net.Conn) *tunnel {
 	b.Lock()
 	defer b.Unlock()
@@ -204,6 +213,8 @@ func servSocks(b *bundle) {
 func mainServer(c net.Conn) {
 	b := newBundle(c)
 	go servSocks(b)
+	
+	// 从远端server(xtunneld)的连接上，读数据，然后发送回应用程序
 	var header [4]byte
 	for {
 		_,err := b.Read(header[:])
