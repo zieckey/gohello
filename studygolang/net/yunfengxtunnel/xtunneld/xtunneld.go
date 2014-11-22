@@ -13,10 +13,10 @@ const bufferSize = 4096
 const maxConn = 0x10000
 const xor = 0x64
 
-var socksAddr * net.TCPAddr
+var socksAddr *net.TCPAddr
 
 func init() {
-	_ , err := net.ResolveTCPAddr("tcp",socksServer)
+	_, err := net.ResolveTCPAddr("tcp", socksServer)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -24,44 +24,46 @@ func init() {
 
 type tunnel struct {
 	id int
-	* list.Element
-	send chan []byte
-	reply io.Writer
+	*list.Element
+	send  chan []byte
+	reply io.Writer // the connection from my local xtunnel client which is inside of the GFW
 }
 
 type bundle struct {
-	t [maxConn] tunnel
-	* list.List
-	* xsocket
+	t [maxConn]tunnel
+	*list.List
+	*xsocket // the connection from my local xtunnel client which is inside of the GFW
 }
 
 type xsocket struct {
 	net.Conn
-	* sync.Mutex
+	*sync.Mutex
 }
 
 func (s xsocket) Read(data []byte) (n int, err error) {
-	n,err = io.ReadFull(s.Conn, data)
-	if n>0 {
-		for i:=0;i<n;i++ {
-			data[i] = data[i]^xor
+	n, err = io.ReadFull(s.Conn, data)
+	if n > 0 {
+		for i := 0; i < n; i++ {
+			data[i] = data[i] ^ xor
 		}
 	}
 
 	return
 }
 
+// xsocket.Write is called from many goroutines which take care of the connections to socks5 server
+// so we need a lock here
 func (s xsocket) Write(data []byte) (n int, err error) {
 	s.Lock()
 	defer s.Unlock()
-	log.Println("Send",len(data))
-	for i:=0;i<len(data);i++ {
-		data[i] = data[i]^xor
+	log.Println("Send", len(data))
+	for i := 0; i < len(data); i++ {
+		data[i] = data[i] ^ xor
 	}
 	x := 0
 	all := len(data)
 
-	for all>0 {
+	for all > 0 {
 		n, err = s.Conn.Write(data)
 		if err != nil {
 			n += x
@@ -72,28 +74,28 @@ func (s xsocket) Write(data []byte) (n int, err error) {
 		data = data[n:]
 	}
 
-	return all,err
+	return all, err
 }
 
 func (t *tunnel) processBack(c net.Conn) {
-//	c.SetReadTimeout(1e7)
+	//	c.SetReadTimeout(1e7)
 	var buf [bufferSize]byte
 	for {
-		n,err := c.Read(buf[4:])
-		if n>0 {
+		n, err := c.Read(buf[4:])
+		if n > 0 {
 			t.sendBack(buf[:4+n])
 		}
 		e, ok := err.(net.Error)
 		if !(ok && e.Timeout()) && err != nil {
-			log.Println(n,err)
+			log.Println(n, err)
 			return
 		}
 	}
 }
 
 func (t *tunnel) sendClose() {
-	buf := [4]byte {
-		byte(t.id>>8),
+	buf := [4]byte{
+		byte(t.id >> 8),
 		byte(t.id & 0xff),
 		0,
 		0,
@@ -101,8 +103,9 @@ func (t *tunnel) sendClose() {
 	t.reply.Write(buf[:])
 }
 
+// send data back to xtunnel client (inside of GFW)
 func (t *tunnel) sendBack(buf []byte) {
-	buf[0] = byte(t.id>>8)
+	buf[0] = byte(t.id >> 8)
 	buf[1] = byte(t.id & 0xff)
 	length := len(buf) - 4
 	buf[2] = byte(length >> 8)
@@ -111,7 +114,7 @@ func (t *tunnel) sendBack(buf []byte) {
 }
 
 func connectSocks() net.Conn {
-	c,err := net.DialTCP("tcp", nil, socksAddr)
+	c, err := net.DialTCP("tcp", nil, socksAddr)
 	if err != nil {
 		return nil
 	}
@@ -121,25 +124,25 @@ func connectSocks() net.Conn {
 
 func (t *tunnel) process() {
 	c := connectSocks()
-	if c==nil {
+	if c == nil {
 		t.sendClose()
 	} else {
 		go t.processBack(c)
 	}
 	send := t.send
-	
+
 	for {
-		buf,ok := <-send 
+		buf, ok := <-send
 		if !ok {
-			if c!=nil {
+			if c != nil {
 				c.Close()
 			}
 			return
 		}
-		if c!=nil {
-			n,err := c.Write(buf)
+		if c != nil {
+			n, err := c.Write(buf) // send data to socks5 server
 			if err != nil {
-				log.Println("tunnel",n,err)
+				log.Println("tunnel", n, err)
 				t.sendClose()
 			}
 		}
@@ -159,12 +162,12 @@ func (t *tunnel) close() {
 func newBundle(c net.Conn) *bundle {
 	b := new(bundle)
 	b.List = list.New()
-	for i:=0;i<maxConn;i++ {
+	for i := 0; i < maxConn; i++ {
 		t := &b.t[i]
 		t.id = i
 		t.Element = b.PushBack(t)
 	}
-	b.xsocket = & xsocket { c , new(sync.Mutex) }
+	b.xsocket = &xsocket{c, new(sync.Mutex)}
 	return b
 }
 
@@ -181,7 +184,7 @@ func (b *bundle) get(id int) *tunnel {
 	if t.Element != nil {
 		b.Remove(t.Element)
 		t.Element = nil
-		t.open(b.xsocket)
+		t.open(b.xsocket) // Open a connection to the socks5 server
 	}
 	return t
 }
@@ -190,19 +193,20 @@ func servTunnel(c net.Conn) {
 	b := newBundle(c)
 	var header [4]byte
 	for {
-		_,err := b.Read(header[:])
+		// Read data from my local xtunnel client which is inside of the GFW
+		_, err := b.Read(header[:])
 		if err != nil {
 			log.Fatal(err)
 		}
-		id := int(header[0]) << 8 | int(header[1])
-		length := int(header[2]) << 8 | int(header[3])
-		log.Println("Recv",id,length)
+		id := int(header[0])<<8 | int(header[1])
+		length := int(header[2])<<8 | int(header[3])
+		log.Println("Recv", id, length)
 		if length == 0 {
-			b.free(id)			
+			b.free(id)
 		} else {
 			t := b.get(id)
 			buf := make([]byte, length)
-			_,err := b.Read(buf)
+			_, err := b.Read(buf)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -212,16 +216,16 @@ func servTunnel(c net.Conn) {
 }
 
 func start(addr string) {
-	a , err := net.ResolveTCPAddr("tcp",addr)
+	a, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	l , err2 := net.ListenTCP("tcp",a)
+	l, err2 := net.ListenTCP("tcp", a)
 	if err2 != nil {
 		log.Fatal(err2)
 	}
-	log.Printf("xtunneld bind %s",a)
-	c , err3 := l.Accept()
+	log.Printf("xtunneld bind %s", a)
+	c, err3 := l.Accept()
 	if err3 != nil {
 		log.Fatal(err3)
 	}
@@ -231,4 +235,4 @@ func start(addr string) {
 
 func main() {
 	start(bindAddr)
-	}
+}
