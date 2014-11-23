@@ -7,13 +7,26 @@ import (
 )
 
 const bindAddr = ":2011"
-const defaultBufSize = 4096
+const defaultBufSize = 65536
 const maxConn = 0x10000
 
 type Tunnel struct {
 	lconn  net.Conn // the connection from local app
 	rconn  net.Conn // the connection to remote server
 	closed bool
+}
+
+func refuse(t *Tunnel) {
+	buf := []byte{0, 0x5b, 0, 0, 0, 0, 0, 0}
+	t.lconn.Write(buf)
+	t.closed = true
+}
+
+//func grant(t *Tunnel, ip [4]byte, port int16) {
+func grant(t *Tunnel) {
+	//TODO socks4a need return ip/port
+	buf := []byte{0, 0x5a, 0, 0, 0, 0, 0, 0}
+	t.lconn.Write(buf)
 }
 
 func socks4a(ipBuf []byte) bool {
@@ -32,7 +45,7 @@ func servRemoteTunnel(t *Tunnel) {
 	buf := make([]byte, defaultBufSize)
 	for !t.closed {
 		n, err := t.rconn.Read(buf)
-		log.Printf("read %v bytes from remote server %v [%v]", n, t.rconn.RemoteAddr(), string(buf))
+		log.Printf("read %v bytes from remote server %v", n, t.rconn.RemoteAddr())
 		if n == 0 {
 			t.closed = true
 			return
@@ -45,19 +58,6 @@ func servRemoteTunnel(t *Tunnel) {
 
 		t.lconn.Write(buf[:n])
 	}
-}
-
-func refuse(t *Tunnel) {
-	buf := []byte{0, 0x5b, 0, 0, 0, 0, 0, 0}
-	t.lconn.Write(buf)
-	t.closed = true
-}
-
-//func grant(t *Tunnel, ip [4]byte, port int16) {
-func grant(t *Tunnel) {
-	//TODO socks4a need return ip/port
-	buf := []byte{0, 0x5a, 0, 0, 0, 0, 0, 0}
-	t.lconn.Write(buf)
 }
 
 func connectRemote(buf []byte, bufSize int, t *Tunnel) bool {
@@ -100,7 +100,7 @@ func servLocalTunnel(lconn net.Conn) {
 	bufSize := 0
 	for !t.closed {
 		n, _ := t.lconn.Read(buf[bufSize:])
-		log.Printf("read %v bytes from local app %v bytes : [%s]", n, t.lconn.RemoteAddr(), string(buf))
+		log.Printf("read %v bytes from local app %v bytes", n, t.lconn.RemoteAddr())
 		if n == 0 {
 			t.closed = true
 			return
