@@ -69,7 +69,7 @@ func connectRemote(buf []byte, bufSize int, t *Tunnel) bool {
 	}
 	ver := buf[0]
 	cmd := buf[1]
-	port := int(buf[2]<<8) + int(buf[3])
+	port := int(buf[2])<<8 + int(buf[3])
 	ip := net.IPv4(buf[4], buf[5], buf[6], buf[7])
 	log.Printf("ver=%v cmd=%v remote addr %v:%v\n", ver, cmd, ip, port)
 	if socks4a(buf[4:]) {
