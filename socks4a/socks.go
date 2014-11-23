@@ -1,23 +1,19 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"log"
 	"net"
 )
 
-//import "sync"
-
 const bindAddr = ":2011"
-const defaultBufferSize = 4096
+const defaultBufSize = 4096
 const maxConn = 0x10000
 
 type Tunnel struct {
-	lconn net.Conn // the connection from local app
-	rconn net.Conn // the connection to remote server
-	lbuf  *bufio.Reader // refactor : don't use this buffered io
-	//closed bool
+	lconn  net.Conn // the connection from local app
+	rconn  net.Conn // the connection to remote server
+	closed bool
 }
 
 func socks4a(ipBuf []byte) bool {
@@ -32,16 +28,16 @@ func socks4a(ipBuf []byte) bool {
 }
 
 func servRemoteTunnel(t *Tunnel) {
-	buf := make([]byte, defaultBufferSize)
-	for {
+	defer t.rconn.Close()
+	buf := make([]byte, defaultBufSize)
+	for !t.closed {
 		n, err := t.rconn.Read(buf)
 		log.Printf("read %v bytes from remote server %v [%v]", n, t.rconn.RemoteAddr(), string(buf))
 		if n == 0 {
-			t.lconn.Close()
-			t.rconn.Close()
+			t.closed = true
 			return
 		}
-		
+
 		if err != nil {
 			log.Printf("Read from remote server %v", err)
 			return
@@ -54,25 +50,59 @@ func servRemoteTunnel(t *Tunnel) {
 func refuse(t *Tunnel) {
 	buf := []byte{0, 0x5b, 0, 0, 0, 0, 0, 0}
 	t.lconn.Write(buf)
-	t.lconn.Close()
+	t.closed = true
 }
 
+//func grant(t *Tunnel, ip [4]byte, port int16) {
 func grant(t *Tunnel) {
+	//TODO socks4a need return ip/port
 	buf := []byte{0, 0x5a, 0, 0, 0, 0, 0, 0}
 	t.lconn.Write(buf)
+}
+
+func connectRemote(buf []byte, bufSize int, t *Tunnel) bool {
+	// connecting to remote server
+	end := bytes.IndexByte(buf[8:], byte(0))
+	if end < -1 {
+		log.Printf("cannot find '\\0', need to read more data")
+		return false // need to read more data
+	}
+	ver := buf[0]
+	cmd := buf[1]
+	port := int(buf[2]<<8) + int(buf[3])
+	ip := net.IPv4(buf[4], buf[5], buf[6], buf[7])
+	log.Printf("ver=%v cmd=%v remote addr %v:%v\n", ver, cmd, ip, port)
+	if socks4a(buf[4:]) {
+		// TODO get the remote ip
+	}
+
+	a := &net.TCPAddr{IP: ip, Port: port}
+	c, err := net.DialTCP("tcp", nil, a)
+	if err != nil {
+		log.Printf("DialTCP", err)
+		refuse(t)
+		return false
+	}
+	log.Printf("has connected to remote %s", a)
+	t.rconn = c
+	if end < bufSize {
+		t.rconn.Write(buf[end:])
+	}
+	go servRemoteTunnel(t)
+	return true
 }
 
 func servLocalTunnel(lconn net.Conn) {
 	t := new(Tunnel)
 	t.lconn = lconn
-	t.lbuf = bufio.NewReader(lconn)
-	buf := make([]byte, defaultBufferSize)
+	defer t.lconn.Close()
+	buf := make([]byte, defaultBufSize)
 	bufSize := 0
-	for {
-		n, _ := t.lbuf.Read(buf[bufSize:])
+	for !t.closed {
+		n, _ := t.lconn.Read(buf[bufSize:])
 		log.Printf("read %v bytes from local app %v bytes : [%s]", n, t.lconn.RemoteAddr(), string(buf))
 		if n == 0 {
-			t.lconn.Close()
+			t.closed = true
 			return
 		}
 
@@ -83,32 +113,12 @@ func servLocalTunnel(lconn net.Conn) {
 			continue
 		}
 
-		// connecting to remote server
-		if n+bufSize > 8 {
-			end := bytes.IndexByte(buf[8:], byte(0))
-			if end < -1 {
-				log.Printf("cannot find '\\0', need to read more data")
-				continue // need to read more data
-			}
-			ver := buf[0]
-			cmd := buf[1]
-			port := int(buf[2]<<8) + int(buf[3])
-			ip := net.IPv4(buf[4], buf[5], buf[6], buf[7])
-			log.Printf("ver=%v cmd=%v remote addr %v:%v\n", ver, cmd, ip, port)
-			if socks4a(buf[4:]) {
-				// TODO get the remote ip
-			}
+		if n+bufSize <= 8 {
+			log.Printf("need to recv more data")
+			continue
+		}
 
-			a := &net.TCPAddr{IP: ip, Port: port}
-			c, err2 := net.DialTCP("tcp", nil, a)
-			if err2 != nil {
-				log.Printf("DialTCP", err2)
-				refuse(t)
-				return
-			}
-			log.Printf("has connected to remote %s", a)
-			t.rconn = c
-			go servRemoteTunnel(t)
+		if connectRemote(buf, bufSize, t) {
 			bufSize = 0
 			grant(t)
 		}
@@ -120,14 +130,14 @@ func start(addr string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	l, err2 := net.ListenTCP("tcp", a)
-	if err2 != nil {
-		log.Fatal(err2)
+	listener, err := net.ListenTCP("tcp", a)
+	if err != nil {
+		log.Fatal(err)
 	}
-	log.Printf("socks server bind %s", a)
+	log.Printf("socks server bind %v", a)
 	for {
-		c, err3 := l.Accept()
-		if err3 != nil {
+		c, err := listener.Accept()
+		if err != nil {
 			log.Println(err)
 			continue
 		}
