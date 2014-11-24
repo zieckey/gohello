@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 	//"github.com/astaxie/beego/orm"
@@ -41,5 +42,14 @@ func main() {
 	}()
 	t0 := time.Now()
 	r, err := p.Get()
-	fmt.Printf("Waited %v for goroutine to stop. result [%v] err=%v\n", time.Since(t0), r, err) // Output : Waited 500.05ms for goroutine to stop. result [okxxx] err=<nil>
+	fmt.Printf("Waited %v result [%v] err=%v\n", time.Since(t0), r, err) // Output : Waited 500.05ms result [okxxx] err=<nil>
+
+	p = promise.NewPromise()
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		p.Reject(errors.New("failed"))
+	}()
+	t0 = time.Now()
+	r, err = p.Get()
+	fmt.Printf("Waited %v result [%v] err=%v\n", time.Since(t0), r, err) // Output : Waited 500.05ms result [<nil>] err=failed
 }
