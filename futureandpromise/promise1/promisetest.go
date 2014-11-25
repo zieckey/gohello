@@ -80,7 +80,7 @@ func testCallbacks() {
 
 	p := promise.NewPromise()
 	go func() {
-		<- time.After(timeout)
+		<-time.After(timeout) //TODO
 		p.Resolve("ok")
 	}()
 
