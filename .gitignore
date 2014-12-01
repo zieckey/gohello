@@ -1,6 +1,7 @@
 *.exe
 *.exe~
 *.a
+*.o
 src/go.tools
 bin/*
 benchmark/httpecho/httpecho
