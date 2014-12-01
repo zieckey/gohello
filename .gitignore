@@ -5,3 +5,6 @@
 src/go.tools
 bin/*
 benchmark/httpecho/httpecho
+cgo/cgohello5/cgohello5
+cgo/cgohello4/cgohello4
+cgo/cgohello3/cgohello3
