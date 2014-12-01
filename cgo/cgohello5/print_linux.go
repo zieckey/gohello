@@ -1,9 +1,9 @@
 package main
 
 /*
-#cgo CFLAGS: -I ./libprint
+#cgo CFLAGS: -I .
 #cgo LDFLAGS: -L ./libprint -lprint
-#include "myprint.h"
+#include "libprint/myprint.h"
 #include <stdlib.h>
 */
 import "C"
