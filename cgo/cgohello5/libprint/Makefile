@@ -9,8 +9,6 @@ SRCS := $(wildcard *.c)
 OBJS := $(patsubst %.c, %.o, $(SRCS)) 
 
 all : $(TARGET)
-	go build
-	./${TARGET}
 
 $(TARGET) : $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS) 
@@ -20,4 +18,4 @@ $(TARGET) : $(OBJS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean :
-	rm -rf ./${TARGET}
+	rm -rf ./${TARGET} $(OBJS)

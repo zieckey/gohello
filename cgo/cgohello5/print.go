@@ -2,7 +2,7 @@ package main
 
 /*
 #cgo CFLAGS: -I ./libprint
-#cgo LDFLAGS: -L ./libprint
+#cgo LDFLAGS: -L ./libprint -lprint
 #include "myprint.h"
 #include <stdlib.h>
 */
