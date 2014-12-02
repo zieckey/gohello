@@ -40,6 +40,7 @@ func main() {
 	pkg.Testappend()
 	pkg.TestDerive()
     pkg.TestDefer()
+    pkg.TestBytes()
 }
 
 

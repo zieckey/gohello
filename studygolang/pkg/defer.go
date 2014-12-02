@@ -20,4 +20,5 @@ func f() {
 func TestDefer() {
 	fmt.Printf("\nTestDefer:\n")
 	f()
+	fmt.Printf("\n\n")
 }
