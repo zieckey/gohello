@@ -1,18 +1,16 @@
 package main
 
-
 import "github.com/zieckey/gohello/studygolang/pkg"
 import "github.com/zieckey/gohello/studygolang/util"
 
-
 func main() {
-    pkg.StudyForLoop()
-    pkg.FizzBuzzConstIfElse()
-    pkg.StringFunc()
-    pkg.StringRune()
-    pkg.TestPanicRecover()
-    pkg.TestInterface()
-    pkg.TestAnimalInterface()
+	pkg.StudyForLoop()
+	pkg.FizzBuzzConstIfElse()
+	pkg.StringFunc()
+	pkg.StringRune()
+	pkg.TestPanicRecover()
+	pkg.TestInterface()
+	pkg.TestAnimalInterface()
 	util.TestCallerName()
 	pkg.TestHttpGet()
 	pkg.TestGoPointer()
@@ -39,20 +37,18 @@ func main() {
 	pkg.TestMD5HMAC()
 	pkg.Testappend()
 	pkg.TestDerive()
-    pkg.TestDefer()
-    pkg.TestBytes()
+	pkg.TestBytes()
+	pkg.TestDefer()
 }
-
-
 
 /*
 package main
- 
+
 import (
   "fmt"
   "testing"
 )
- 
+
 func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
   if a == b {
     return
@@ -62,7 +58,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
 	}
 	t.Fatal(message)
 }
- 
+
 func TestSimple(t *testing.T) {
   a := 42
   assertEqual(t, a, 42, "")

@@ -14,6 +14,11 @@ func testBytesParameter2(buf []byte) {
 	fmt.Printf("modified -> len(buf)=%v content:%v\n", len(buf), string(buf))
 }
 
+func testBytesCap() {
+	buf := make([]byte, 32)
+	copy(buf, []byte("123"))
+	fmt.Println("len=%v cap=%v\n", len(buf), cap(buf))
+}
 
 /*All output:
 
@@ -37,4 +42,6 @@ func TestBytes() {
 	buf := []byte("1234")
 	testBytesParameter2(buf)
 	fmt.Printf("output   -> len(buf)=%v content:%v\n", len(buf), string(buf))
+
+	testBytesCap()
 }

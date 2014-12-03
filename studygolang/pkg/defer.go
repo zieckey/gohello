@@ -21,4 +21,17 @@ func TestDefer() {
 	fmt.Printf("\nTestDefer:\n")
 	f()
 	fmt.Printf("\n\n")
+	funcB()
+	fmt.Printf("\n\n")
+}
+
+// Output : acdb
+// defer的执行点是函数退出时顺序执行，不是离开代码块的时候执行
+func funcB() {
+	fmt.Printf("a")
+	{
+		defer fmt.Printf("b")
+	}
+	fmt.Printf("c")
+	defer fmt.Printf("d")
 }
