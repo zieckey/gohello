@@ -21,8 +21,7 @@ $ ./gogit.exe https://github.com/ant0ine/go-urlrouter
 cmd 1:  git clone https://github.com/ant0ine/go-urlrouter
 cmd 2:  mkdir -p e:/goworkspace/go/src/github.com/ant0ine
 cmd 3:  mv go-urlrouter e:/goworkspace/go/src/github.com/ant0ine
-exec command failed :  git clone https://github.com/ant0ine/go-urlrouter exec: "
-git clone https://github.com/ant0ine/go-urlrouter": file does not exist
+exec command failed :  git clone https://github.com/ant0ine/go-urlrouter exec: "git clone https://github.com/ant0ine/go-urlrouter": file does not exist
 */
 
 func main() {
