@@ -39,6 +39,7 @@ func main() {
 	pkg.TestDerive()
 	pkg.TestBytes()
 	pkg.TestDefer()
+	pkg.TestStructCopy()
 }
 
 /*
