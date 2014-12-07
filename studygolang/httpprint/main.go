@@ -12,7 +12,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	for {
 		n, err := r.Body.Read(buf)
 		sum += n
-		log.Printf("recv %v byte, sum=%v, err=%v\n", n, sum, err.Error())
+		log.Printf("recv %v byte, sum=%v\n", n, sum)
 		if sum >= int(len) {
 			break
 		}
