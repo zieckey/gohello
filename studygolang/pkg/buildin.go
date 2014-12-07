@@ -10,14 +10,14 @@ func testBytesParameter(buf []byte) {
 
 func testBytesParameter2(buf []byte) {
 	fmt.Printf("input    -> len(buf)=%v content:%v\n", len(buf), string(buf))
-	buf[0] = 'a'
+	buf[0] = 'a' //这里的修改会影响到函数外面，也就是说这里传参只是浅拷贝。
 	fmt.Printf("modified -> len(buf)=%v content:%v\n", len(buf), string(buf))
 }
 
 func testBytesCap() {
 	buf := make([]byte, 32)
 	copy(buf, []byte("123"))
-	fmt.Println("len=%v cap=%v\n", len(buf), cap(buf))
+	fmt.Printf("len=%v cap=%v\n", len(buf), cap(buf))
 }
 
 /*All output:
@@ -27,9 +27,10 @@ len(buf)=1 content:1
 len(buf)=2 content:12
 len(buf)=3 content:123
 len(buf)=4 content:1234
-input -> len(buf)=4 content:1234
+input    -> len(buf)=4 content:1234
 modified -> len(buf)=4 content:a234
-output -> len(buf)=4 content:a234
+output   -> len(buf)=4 content:a234
+len=32 cap=32
 
 */
 func TestBytes() {
