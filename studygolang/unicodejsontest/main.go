@@ -1,7 +1,8 @@
 package main
 
-import "fmt"
-import "encoding/json"
+import "log"
+//import "encoding/json"
+import "github.com/zieckey/gohello/studygolang/unicodejsontest/json"
 
 /* The php code:
 
@@ -14,11 +15,12 @@ echo json_encode(json_decode($s));
 // Go Playground : http://play.golang.org/p/D9uQlFgPJo
 
 func main() {
-	fmt.Printf("\n\n")
+	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime)
+	log.Printf("\n\n")
 	var s = make(map[string]interface{})
-	s["Name"] = "魏"
+	s["Name"] = "\n\rabc\n魏\n国d\nef"
 	result, _ := json.Marshal(s)
-	fmt.Println("json.Marshal ==> ", string(result))
+	log.Println("json.Marshal ==> ", string(result))
 
 	type User struct {
 		Name string
@@ -26,6 +28,6 @@ func main() {
 
 	u := &User{}
 	_ = json.Unmarshal(result, u)
-	fmt.Printf("json.Unmarshal ==> Name=%v\n", u.Name)
+	log.Printf("json.Unmarshal ==> Name=%v\n", u.Name)
 
 }
