@@ -7,7 +7,6 @@ func main() {
 	pkg.StudyForLoop()
 	pkg.FizzBuzzConstIfElse()
 	pkg.StringFunc()
-	pkg.StringRune()
 	pkg.TestPanicRecover()
 	pkg.TestInterface()
 	pkg.TestAnimalInterface()
@@ -40,6 +39,7 @@ func main() {
 	pkg.TestBytes()
 	pkg.TestDefer()
 	pkg.TestStructCopy()
+	pkg.StringRune()
 }
 
 /*

@@ -62,31 +62,6 @@ func StringFunc() {
 	fmt.Printf("   len(s)=%d    buildin-len(s)=%d", l, len(s))
 }
 
-func StringRune() {
-	fmt.Printf("\n\nStringRune:\n")
-	
-	str :="weigo老魏"
-	fmt.Printf("len=%v\n", len(str))
-	for  i:=0;i<len(str);i++ {
-	    fmt.Println(str[i])
-	}
-	
-	for  i,s :=  range str {
-	    fmt.Println(i,"Unicode(",s,") string=",string(s))
-	}
-	
-	r := []rune(str)
-	fmt.Println("rune=",r, " len(rune)=", len(r))
-	for i:=0;i<len(r) ; i++ {
-	 	fmt.Println("r[",i,"]=",r[i],"string=",string(r[i]))
-	}
-
-	b := []byte(str)
-	fmt.Println("byte=",r)
-	for i:=0;i<len(b) ; i++ {
-	 	fmt.Println("b[",i,"]=",b[i],"string=",string(b[i]))
-	}
-}
 
 func ConvertInt64ToInt(x int64) int{
 	if math.MinInt32<=x && x<=math.MaxInt32 {
