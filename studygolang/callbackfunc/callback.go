@@ -9,8 +9,7 @@ type Handler interface {
 }
 
 type HandlerFunc func(buf string)
-
-func (f HandlerFunc) ServeHTTP(buf string) {
+func (f HandlerFunc) ServeHTTP(buf string) { //实现Handler接口
 	f(buf)
 }
 
