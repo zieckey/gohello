@@ -55,7 +55,7 @@ func walkdir(dir string, imports *map[string]string) {
 		}
 		l := len(path)
 		if l > 3 && path[l-3:] == ".go" {
-			parse(path, imports)
+			parse(path, imports) // parse one go source file
 		}
 		return nil
 	})
@@ -66,5 +66,9 @@ func walkdir(dir string, imports *map[string]string) {
 }
 
 func parse(path string, imports *map[string]string) {
-	fmt.Printf("%v\n", path)
+	//fmt.Printf("%v\n", path)
+//	contents, err := ioutil.ReadFile(filename)
+//	if err != nil {
+//		return err
+//	}
 }
