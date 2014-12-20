@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"runtime"
+	"github.com/zieckey/gohello/goroutineid/stackfunc/goid"
 )
 
 
@@ -28,7 +29,7 @@ func task(name string, ch chan int) {
             for j := 0; j < 20; j++ {
                 strconv.Itoa(i) // cost some CPU time
             }
-            fmt.Printf("goid=" + strconv.Itoa(int(GoroutineID())) + " " + name + " " + strconv.Itoa(i) + "\n")
+            fmt.Printf("goid=" + strconv.Itoa(int(goid.Get())) + " " + name + " " + strconv.Itoa(i) + "\n")
             i++
         }
         ch <- 1

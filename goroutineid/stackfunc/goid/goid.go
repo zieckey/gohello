@@ -1,4 +1,4 @@
-package main
+package goid
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func putBuf(b []byte) {
 
 var goroutineSpace = []byte("goroutine ")
 
-func GoroutineID() int64 {
+func Get() int64 {
 	b := getBuf()
 	defer putBuf(b)
 	b = b[:runtime.Stack(b, false)]
