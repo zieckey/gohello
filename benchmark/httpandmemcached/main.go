@@ -28,6 +28,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.URL.RawQuery[4:]
 	conn := pool.Get()
+	defer pool.Put(conn)
 
 	// HTTP GET
 	if r.Method == "GET" {
