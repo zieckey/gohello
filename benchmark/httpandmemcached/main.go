@@ -28,6 +28,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.URL.RawQuery[4:]
 	conn := pool.Get()
+	if conn == nil {
+		goto Handler403
+	}
 	defer pool.Put(conn)
 
 	// HTTP GET
@@ -67,6 +70,9 @@ Handler404:
 func main() {
 	flag.Parse()
 	pool = New(*addr)
+	if pool == nil {
+		log.Fatal("Connect memcached failed : %v\n", *addr)
+	}
 	http.HandleFunc("/memcached", handler)
 	log.Fatal(http.ListenAndServe(":8091", nil))
 }
