@@ -23,7 +23,6 @@ func main() {
 	pkg.TestWriteFile()
 	pkg.TestReflect()
 	pkg.TestJSON()
-	pkg.TestGoSimpleJSON()
 	pkg.TestExec_date()
 	pkg.TestMap()
 	pkg.TestVariableNumberArguments()
@@ -40,6 +39,8 @@ func main() {
 	pkg.TestDefer()
 	pkg.TestStructCopy()
 	pkg.StringRune()
+	pkg.TestGoSimpleJSON()
+	pkg.TestGoSimpleJSONArraySet()
 }
 
 /*
