@@ -10,7 +10,7 @@ import (
 func TestFileReadAndWrite() {
 
 	path := "tmp/TestFileReadAndWrite.exe"
-	tty, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0)
+	tty, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC, 0755)
 	defer func() {
 		tty.Close()
 		os.Remove(path)
