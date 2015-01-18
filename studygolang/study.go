@@ -39,8 +39,10 @@ func main() {
 	pkg.TestDefer()
 	pkg.TestStructCopy()
 	pkg.StringRune()
-	pkg.TestGoSimpleJSON()
 	pkg.TestGoSimpleJSONArraySet()
+	pkg.TestGoSimpleJSON()
+	pkg.TestCRC32IEEE()
+	pkg.BinaryEncoding()
 }
 
 /*
