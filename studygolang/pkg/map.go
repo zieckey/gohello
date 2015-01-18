@@ -13,6 +13,10 @@ func TestMap() {
 	m["b"] = "bv"
 	fmt.Printf("m: %v\n", m)
 
+	// 查询是否存在某个key
+	_, exists := m["a"]
+	fmt.Printf("a in map exists : %v", exists)
+
 	fmt.Printf("===> Assign m -> s\n")
 	s := make(SectionMap)
 	s[""] = m	// 是引用的拷贝，map本身的内容都同一份
@@ -31,7 +35,6 @@ func TestMap() {
 	sd, _ = s["m"]
 	fmt.Printf("s[\"m\"]: %v\n", sd)
 	fmt.Printf("s: %v\n", s)
-	
 	
 	v,ok := m["c"]
 	fmt.Printf("the value of [c] in m is [%v] ok=%v", v,ok)
