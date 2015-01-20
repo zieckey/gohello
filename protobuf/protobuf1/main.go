@@ -7,7 +7,7 @@ package main
 import "fmt"
 //import "os"
 //import "net"
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import json "encoding/json"
 import math "math"
 

@@ -5,7 +5,7 @@
 package main
 
 import "fmt"
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import "github.com/zieckey/gohello/protobuf/protobuf2/req"
 
 
