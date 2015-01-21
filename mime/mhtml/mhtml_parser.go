@@ -9,7 +9,8 @@ import (
 	"mime"
 	"mime/multipart"
 	"net/textproto"
-	//"errors"
+	"strings"
+	"encoding/xml"
 )
 
 var _ = ioutil.ReadAll
@@ -26,6 +27,18 @@ func New() *MHtml {
 }
 
 func (m *MHtml) Parse(mht []byte) error {
+	if err := m.ParseHTML(mht); err != nil {
+		return err
+	}
+	
+	r := strings.NewReader(m.Html)
+	xmldec := xml.NewDecoder(r)
+	xmldec.Token()
+	//TODO
+	return nil
+}
+
+func (m *MHtml) ParseHTML(mht []byte) error {	
 	br := bufio.NewReader(bytes.NewReader(mht)) // The buffer reader
 	tr := textproto.NewReader(br)
 	boundary := m.GetBoundary(tr)
