@@ -1,14 +1,15 @@
 package mhtml
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/zieckey/goini"
-	"strings"
 	"io/ioutil"
-	"mime/multipart"
+	"net/textproto"
+	"strings"
 )
 
 type MHtml struct {
@@ -53,39 +54,51 @@ func (m *MHtml) GetMHtmlFromLog(logxml string) ([]byte, error) {
 		return nil, err
 	}
 	ioutil.WriteFile("mime.txt", mhtml, 0644)
-	
-//	mediatype , params , err  := mime.ParseMediaType(string(mhtml))
-//	fmt.Printf("mediatype=%v, params=%v, err=%v\n", mediatype , params , err)
+
+	//	mediatype , params , err  := mime.ParseMediaType(string(mhtml))
+	//	fmt.Printf("mediatype=%v, params=%v, err=%v\n", mediatype , params , err)
 	return mhtml, nil
 }
 
 func (m *MHtml) Parse(mht []byte) error {
-	boundary := m.GetBoundary(mht)
-	mr := multipart.NewReader(bytes.NewReader(mht), boundary)
-	form, _ := mr.ReadForm(int64(len(mht)))
-	fmt.Printf("%v\n", form)
-	return nil
-	
-	var index = 0
-	for {
-		part, err := mr.NextPart()
-		if err != nil {
-			break
-		}
-		
-		fmt.Println("\n\n================================================================================================================================================================\n\n")
-		d := make([]byte, len(mht))
-		n, err := part.Read(d)
-		d = d[:n]
-		//TODO check err
-		fmt.Printf("filename=%v formname=%v n=%v err=%v content=\n%v", part.FileName(), part.FormName(), n, err, string(d))
-		ioutil.WriteFile(
-			fmt.Sprintf("part-%v.txt", index),
-			[]byte(fmt.Sprintf("filename=%v formname=%v n=%v err=%v Header=%v content=\n%v", part.FileName(), part.FormName(), n, err, part.Header, string(d))),
-			0644)
-
-		index++
+	r := textproto.NewReader(bufio.NewReader(bytes.NewReader(mht)))
+	mimeHeader, err := r.ReadMIMEHeader()
+	if err != nil {
+		return err
 	}
+	fmt.Printf("%v %v\n", mimeHeader, err)
+	contentType := mimeHeader.Get("Content-Type")
+	fmt.Printf("Content-Type = %v %v\n", contentType)
+	
+		//	mediatype , params , err  := mime.ParseMediaType(string(mhtml))
+	//	fmt.Printf("mediatype=%v, params=%v, err=%v\n", mediatype , params , err)
+	
+	//	boundary := m.GetBoundary(mht)
+	//	mr := multipart.NewReader(bytes.NewReader(mht), boundary)
+	//	form, _ := mr.ReadForm(int64(len(mht)))
+	//	fmt.Printf("%v\n", form)
+	//	return nil
+	//
+	//	var index = 0
+	//	for {
+	//		part, err := mr.NextPart()
+	//		if err != nil {
+	//			break
+	//		}
+	//
+	//		fmt.Println("\n\n================================================================================================================================================================\n\n")
+	//		d := make([]byte, len(mht))
+	//		n, err := part.Read(d)
+	//		d = d[:n]
+	//		//TODO check err
+	//		fmt.Printf("filename=%v formname=%v n=%v err=%v content=\n%v", part.FileName(), part.FormName(), n, err, string(d))
+	//		ioutil.WriteFile(
+	//			fmt.Sprintf("part-%v.txt", index),
+	//			[]byte(fmt.Sprintf("filename=%v formname=%v n=%v err=%v Header=%v content=\n%v", part.FileName(), part.FormName(), n, err, part.Header, string(d))),
+	//			0644)
+	//
+	//		index++
+	//	}
 	return nil
 }
 
