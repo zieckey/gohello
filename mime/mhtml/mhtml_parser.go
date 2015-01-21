@@ -1,15 +1,14 @@
 package mhtml
 
 import (
+	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/zieckey/goini"
 	"strings"
-	"bytes"
-	//"mime"
-	"mime/multipart"
 	"io/ioutil"
+	"mime/multipart"
 )
 
 type MHtml struct {
@@ -42,48 +41,56 @@ func (m *MHtml) GetMHtmlFromLog(logxml string) ([]byte, error) {
 		fmt.Printf("parse mhtml error : %v\n", err.Error())
 		return nil, err
 	}
-	mhtml, ok := ini.Get("mhtml")
+	mhtmlenc, ok := ini.Get("mhtml")
 	if !ok {
 		fmt.Printf("cannot found 'mhtml'\n")
 		return nil, errors.New("cannot found 'mhtml'")
 	}
 
-	mineenc, err := base64.StdEncoding.DecodeString(mhtml)
+	mhtml, err := base64.StdEncoding.DecodeString(mhtmlenc)
 	if err != nil {
 		fmt.Printf("'mhtml' base64 decode error : %v\n", err.Error())
 		return nil, err
 	}
-
-	return mineenc, nil
+	ioutil.WriteFile("mime.txt", mhtml, 0644)
+	
+//	mediatype , params , err  := mime.ParseMediaType(string(mhtml))
+//	fmt.Printf("mediatype=%v, params=%v, err=%v\n", mediatype , params , err)
+	return mhtml, nil
 }
-
-
 
 func (m *MHtml) Parse(mht []byte) error {
 	boundary := m.GetBoundary(mht)
 	mr := multipart.NewReader(bytes.NewReader(mht), boundary)
+	form, _ := mr.ReadForm(int64(len(mht)))
+	fmt.Printf("%v\n", form)
+	return nil
+	
 	var index = 0
 	for {
 		part, err := mr.NextPart()
 		if err != nil {
 			break
 		}
+		
 		fmt.Println("\n\n================================================================================================================================================================\n\n")
-		d := make([]byte, 1024*1024)
+		d := make([]byte, len(mht))
 		n, err := part.Read(d)
+		d = d[:n]
+		//TODO check err
 		fmt.Printf("filename=%v formname=%v n=%v err=%v content=\n%v", part.FileName(), part.FormName(), n, err, string(d))
 		ioutil.WriteFile(
 			fmt.Sprintf("part-%v.txt", index),
 			[]byte(fmt.Sprintf("filename=%v formname=%v n=%v err=%v Header=%v content=\n%v", part.FileName(), part.FormName(), n, err, part.Header, string(d))),
-			0755)
-		
-		index ++ 
+			0644)
+
+		index++
 	}
 	return nil
 }
 
 func (m *MHtml) GetBoundary(mht []byte) string {
-	//TODO
+	//TODO how to parse an boundary from mht content
 	boundary := "----=_NextPart_000_3E0F_9DFE9458.D3FADCE4"
 	return boundary
 }
