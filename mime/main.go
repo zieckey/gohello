@@ -2,6 +2,12 @@ package main
 
 import (
 	"github.com/zieckey/gohello/mime/mhtml"
+	"github.com/zieckey/goini"
+	"encoding/base64"
+	"strings"
+	"fmt"
+	"errors"
+	"io/ioutil"
 )
 
 var logxml = `
@@ -10,9 +16,47 @@ var logxml = `
 
 func main() {
 	m := mhtml.New()
-	mine, err := m.GetMHtmlFromLog(logxml)
+	mine, err := GetMHtmlFromLog(logxml)
 	if err != nil {
 		return
 	}
 	err = m.Parse(mine)
+}
+
+
+func GetMHtmlFromLog(logxml string) ([]byte, error) {
+	ini := goini.New()
+	logxml = strings.Trim(logxml, "<>")
+	err := ini.Parse([]byte(logxml), "><", ":")
+	if err != nil {
+		fmt.Printf("parse xml log error : %v\n", err.Error())
+		return nil, err
+	}
+
+	req, ok := ini.Get("req")
+	if !ok {
+		fmt.Printf("cannot found 'req'\n")
+		return nil, errors.New("cannot found 'req'")
+	}
+
+	ini.Reset()
+	err = ini.Parse([]byte(req), "&", "=")
+	if err != nil {
+		fmt.Printf("parse mhtml error : %v\n", err.Error())
+		return nil, err
+	}
+	mhtmlenc, ok := ini.Get("mhtml")
+	if !ok {
+		fmt.Printf("cannot found 'mhtml'\n")
+		return nil, errors.New("cannot found 'mhtml'")
+	}
+
+	mhtml, err := base64.StdEncoding.DecodeString(mhtmlenc)
+	if err != nil {
+		fmt.Printf("'mhtml' base64 decode error : %v\n", err.Error())
+		return nil, err
+	}
+	ioutil.WriteFile("mime.txt", mhtml, 0644)
+
+	return mhtml, nil
 }
