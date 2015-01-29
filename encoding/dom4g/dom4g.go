@@ -21,8 +21,8 @@ type Element struct {
 
 func New() *Element {
 	el := &Element{
-		Attrs:     make(map[string]string),
-		Childs:    make(map[string]ElementArray),
+		Attrs:  make(map[string]string),
+		Childs: make(map[string]ElementArray),
 	}
 	return el
 }
@@ -56,28 +56,28 @@ func Parse(r io.Reader) (current *Element, err error) {
 		case xml.EndElement:
 			current = current.Parent
 		case xml.CharData:
-            /*
-            <Person>xxx
-                <FirstName>Xu</FirstName>
-                <LastName>Xinhua</LastName>
-            </Person>
+			/*
+			   <Person>xxx
+			       <FirstName>Xu</FirstName>
+			       <LastName>Xinhua</LastName>
+			   </Person>
 
-            The Person element's CharData will return 3 times.
-            */
+			   The Person element's CharData will return 3 times.
+			*/
 			if current != nil {
 				if len(current.Value) == 0 {
 					current.Value = strings.TrimSpace(string(token))
 				} else {
 					//TODO how to process this case :
-                    /*
-                    <Person>
-                        xxx
-                        <FirstName>Xu</FirstName>
-                        yyy
-                        <LastName>Xinhua</LastName>
-                        zzz
-                    </Person>
-                    */
+					/*
+					   <Person>
+					       xxx
+					       <FirstName>Xu</FirstName>
+					       yyy
+					       <LastName>Xinhua</LastName>
+					       zzz
+					   </Person>
+					*/
 				}
 			}
 		default:
