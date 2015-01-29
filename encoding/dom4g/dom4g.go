@@ -20,19 +20,14 @@ type Element struct {
 }
 
 func New() *Element {
-	el := new(Element)
-	el.Attrs = make(map[string]string)
-	el.Childs = make(map[string]ElementArray)
+	el := &Element{
+		Attrs:     make(map[string]string),
+		Childs:    make(map[string]ElementArray),
+	}
 	return el
 }
 
 func Parse(r io.Reader) (current *Element, err error) {
-	//	defer func() {
-	//		if er := recover(); er != nil {
-	//			fmt.Println(er)
-	//			err = errors.New("xml load error!")
-	//		}
-	//	}()
 	var root *Element
 	decoder := xml.NewDecoder(r)
 	for {
@@ -61,10 +56,29 @@ func Parse(r io.Reader) (current *Element, err error) {
 		case xml.EndElement:
 			current = current.Parent
 		case xml.CharData:
-			
+            /*
+            <Person>xxx
+                <FirstName>Xu</FirstName>
+                <LastName>Xinhua</LastName>
+            </Person>
+
+            The Person element's CharData will return 3 times.
+            */
 			if current != nil {
-				//println("DATA:", string(token), " current=", current, " currentName=", current.Name)
-				current.Value = string(token)
+				if len(current.Value) == 0 {
+					current.Value = strings.TrimSpace(string(token))
+				} else {
+					//TODO how to process this case :
+                    /*
+                    <Person>
+                        xxx
+                        <FirstName>Xu</FirstName>
+                        yyy
+                        <LastName>Xinhua</LastName>
+                        zzz
+                    </Person>
+                    */
+				}
 			}
 		default:
 			return nil, fmt.Errorf("parse xml fail!")
