@@ -4,10 +4,12 @@ import (
 	"flag"
 	"net"
 	"strings"
+	"log"
 )
 
 var serverIpPort = flag.String("h", "127.0.0.1:2007", "The tcp server ip address and listening port")
 var closeWrite = flag.Bool("c", false, "close write after send all message")
+var messageLen = flag.Int("l", 1024*127, "length of the message sending to server")
 
 /*
 假如我是一个client，你是一个server/proxy
@@ -18,26 +20,26 @@ proxy会在client调用shutdown的时候epoll_wait返回，recv会返回0， err
 服务器正确的处理逻辑请参考libevent-1.4的代码, libevent-1.4.14b-stable/http.c:evhttp_connection_done
 */
 func main() {
+	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime)
 	flag.Parse()
 	serverAddr, err := net.ResolveTCPAddr("tcp", *serverIpPort)
 	if err != nil {
-		println("ResolveTCPAddr failed:", err.Error())
+		log.Println("ResolveTCPAddr failed:", err.Error())
 		return
 	}
 
 	conn, err := net.DialTCP("tcp", nil, serverAddr)
 	if err != nil {
-		println("Dial failed:", err.Error())
+		log.Println("Dial failed:", err.Error())
 		return
 	}
 	defer conn.Close()
 
 	reply := make([]byte, 1024*128)
-	sendn := 1024*127
-	message := strings.Repeat("a", sendn)
+	message := strings.Repeat("a", *messageLen)
 	_, err = conn.Write([]byte(message))
 	if err != nil {
-		println("Write to server failed:", err.Error())
+		log.Println("Write to server failed:", err.Error())
 		return
 	}
 	if *closeWrite {
@@ -47,13 +49,13 @@ func main() {
 	for {
 		n, err := conn.Read(reply)
 		if err != nil {
-			println("read from server failed:", err.Error())
+			log.Println("read from server failed:", err.Error())
 			break
 		}
-		println("read ", n, " bytes from server")
+		log.Println("read ", n, " bytes from server")
 		sum += n
-		if sum == sendn {
-			println("read all bytes done!")
+		if sum == *messageLen {
+			log.Println("read all bytes done!")
 			break
 		}
 	}
