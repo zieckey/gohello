@@ -5,6 +5,7 @@ import (
 	"net"
 	"strings"
 	"log"
+	"time"
 )
 
 var serverIpPort = flag.String("h", "127.0.0.1:2007", "The tcp server ip address and listening port")
@@ -59,4 +60,6 @@ func main() {
 			break
 		}
 	}
+	
+	time.Sleep(5*time.Second)
 }
