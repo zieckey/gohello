@@ -142,8 +142,19 @@ type Tester interface {
 }
 
 func (this *UUser) Test() {
-	fmt.Println(&this)
+	fmt.Println(&this, "UUser.Test")
 }
+
+type NNNUUser struct {
+	UUser
+}
+
+func (this *NNNUUser) Test() {
+	fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	fmt.Println(&this, "NNNUUser.Test")
+	this.UUser.Test()
+}
+
 func t11() Tester {
 	var x *UUser = nil
 	return x
@@ -157,6 +168,11 @@ func TestInterface1() {
 		fmt.Printf("t11() return not nil, it is [%v]\n", x) // TODO 这里是为什么，返回的难度是interface nil？？？？？？
 	}
 	fmt.Println(t)
+	
+	var nu NNNUUser
+	nu.Id = 2
+	nu.Name = "NTom"
+	nu.Test()
 }
 
 //////////////////////////////////////////

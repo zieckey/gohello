@@ -17,7 +17,6 @@ func main() {
 	pkg.TestGobBinary()
 	pkg.TestCustomEncodeDecode()
 	pkg.TestInterfaceSerialize()
-	pkg.TestInterface1()
 	pkg.TestEmptyInterface2()
 	pkg.TestFileReadAndWrite()
 	pkg.TestWriteFile()
@@ -43,6 +42,7 @@ func main() {
 	pkg.TestGoSimpleJSON()
 	pkg.TestCRC32IEEE()
 	pkg.BinaryEncoding()
+	pkg.TestInterface1()
 }
 
 /*
