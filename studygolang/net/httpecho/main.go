@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -14,5 +15,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/echo", handler)
+	hostname, _ := os.Hostname()
+	log.Printf("start http://%s:8091/echo", hostname)
 	log.Fatal(http.ListenAndServe(":8091", nil))
 }
