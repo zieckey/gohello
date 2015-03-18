@@ -32,7 +32,6 @@ func main() {
 	pkg.TestUnicodeRune()
 	pkg.TestHMAC()
 	pkg.TestMD5HMAC()
-	pkg.Testappend()
 	pkg.TestDerive()
 	pkg.TestBytes()
 	pkg.TestDefer()
@@ -43,6 +42,7 @@ func main() {
 	pkg.TestCRC32IEEE()
 	pkg.BinaryEncoding()
 	pkg.TestInterface1()
+	pkg.Testappend()
 }
 
 /*
