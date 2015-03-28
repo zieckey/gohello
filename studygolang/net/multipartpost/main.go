@@ -8,7 +8,6 @@ import (
 	"net/http"
 )
 
-// Creates a new file upload http request with optional extra params
 func newMultipartRequest(url string, params map[string]string) (*http.Request, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -25,7 +24,7 @@ func main() {
 		"author":      "zieckey",
 		"description": "A document with all the Go programming language secrets",
 	}
-	request, err := newMultipartRequest("http://build17.kill.corp.qihoo.net:8091/echo", extraParams)
+	request, err := newMultipartRequest("http://10.16.28.17:8091/echo", extraParams)
 	if err != nil {
 		log.Fatal(err)
 	}
