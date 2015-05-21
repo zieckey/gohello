@@ -13,7 +13,7 @@ func makeBuffer() []byte {
 
 func main() {
 	plot := `===
-{ "Name" : "line", "Height" : 600, "Width" : 1900, "ItemName" : ["HeapSys", "bytes", "HeapAlloc", "HeapIdle", "HeapReleased", "NumGC"] }
+{ "Name" : "line", "Height" : 600, "Width" : 1900, "ItemName" : ["HeapSys", "bytes", "HeapAlloc", "HeapIdle", "HeapReleased", "NumGC", "HeapObjects"] }
 ---`
 	fmt.Printf("%v\n", plot)
 	
@@ -38,7 +38,7 @@ func main() {
 		}
 
 		runtime.ReadMemStats(&m)
-		fmt.Printf("%d %d %d %d %d %d %d\n", j, m.HeapSys, bytes, m.HeapAlloc,
-			m.HeapIdle, m.HeapReleased, m.NumGC)
+		fmt.Printf("%d %d %d %d %d %d %d %d\n", j, m.HeapSys, bytes, m.HeapAlloc,
+			m.HeapIdle, m.HeapReleased, m.NumGC, m.HeapObjects)
 	}
 }
