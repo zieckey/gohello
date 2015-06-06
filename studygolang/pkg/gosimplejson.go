@@ -168,3 +168,29 @@ func TestGoSimpleJSONArraySet() {
 	fmt.Printf("%v\n", string(b))	
 }
 
+
+func TestGoSimpleJSONWrongType() {
+	fmt.Println("\n\nTestGoSimpleJSONWrongType")
+	
+	body := `
+{
+    "total": 123,
+    "dept": "server_dev"
+}
+	`
+
+    js, err := simplejson.NewJson([]byte(body))
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+	ds := js.Get("dept").MustString()
+	di := js.Get("dept").MustInt(-1)
+    ts := js.Get("total").MustString()
+    ti := js.Get("total").MustInt(-1)
+	
+	// output：dept_as_int=[-1] dept_as_string=[server_dev] total_as_int=[123] total_as_string=[]
+    fmt.Printf("dept_as_int=[%v] dept_as_string=[%v] total_as_int=[%v] total_as_string=[%v]\n", di, ds, ti, ts)
+    fmt.Printf("============================================================\n")
+}
+

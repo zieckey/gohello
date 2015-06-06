@@ -2,8 +2,10 @@ package main
 
 import "github.com/zieckey/gohello/studygolang/pkg"
 import "github.com/zieckey/gohello/studygolang/util"
+import "log"
 
 func main() {
+	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime)
 	pkg.StudyForLoop()
 	pkg.FizzBuzzConstIfElse()
 	pkg.StringFunc()
@@ -43,6 +45,8 @@ func main() {
 	pkg.BinaryEncoding()
 	pkg.TestInterface1()
 	pkg.Testappend()
+	pkg.TestGoSimpleJSONWrongType()
+	pkg.TestRegexp()
 }
 
 /*
