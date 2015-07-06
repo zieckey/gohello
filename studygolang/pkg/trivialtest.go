@@ -87,3 +87,9 @@ func TestPanicRecover() {
 	IntFromInt64(1099511627775)
 	IntFromInt64(2)
 }
+
+func TestPrintf() {
+	format := "username=%v&email=abc%v%%40163.com&sex=0&submit=%%CC%%E1+%%BD%%BB";
+	fmt.Printf("\n\n========>:")
+	fmt.Printf(format, "username", "12312312321")
+}

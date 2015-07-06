@@ -47,6 +47,8 @@ func main() {
 	pkg.Testappend()
 	pkg.TestGoSimpleJSONWrongType()
 	pkg.TestRegexp()
+	pkg.TestGBK2UTF8()
+	pkg.TestPrintf()
 }
 
 /*
