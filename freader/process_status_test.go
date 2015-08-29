@@ -6,6 +6,7 @@ import (
     "github.com/bmizerany/assert"
     "time"
     "strconv"
+    "os/exec"
 )
 
 
@@ -47,7 +48,6 @@ func TestNewProcessStatus(t *testing.T) {
     assert.Equal(t, err, nil)
     files := ps.GetProcessedFiles()
     ts, ok := files[f1]
-    fmt.Println(files)
     assert.Equal(t, ok, true)
     ts.Start.Equal(t1)
     ts, ok = files[f2]
@@ -62,7 +62,6 @@ func TestNewProcessStatus(t *testing.T) {
     ps.OnFileProcessingFinished(f3, t3)
     files = ps.GetProcessedFiles()
     ts, ok = files[f1]
-    fmt.Println(files)
     assert.Equal(t, ok, true)
     ts.Start.Equal(t1)
     ts, ok = files[f2]
@@ -80,7 +79,6 @@ func TestNewProcessStatus(t *testing.T) {
     ps.OnFileProcessingFinished(f4, t4)
     files = ps.GetProcessedFiles()
     ts, ok = files[f1]
-    fmt.Println(files)
     assert.Equal(t, ok, true)
     ts.Start.Equal(t1)
     ts, ok = files[f2]
@@ -100,7 +98,6 @@ func TestNewProcessStatus(t *testing.T) {
     ps.OnFileProcessingFinished(f4, t4)
     files = ps.GetProcessedFiles()
     ts, ok = files[f1]
-    fmt.Println(files)
     assert.Equal(t, ok, false)
     ts, ok = files[f2]
     assert.Equal(t, ok, true)
@@ -112,4 +109,7 @@ func TestNewProcessStatus(t *testing.T) {
     assert.Equal(t, ok, true)
     ts.Start.Equal(t4)
     ps.Close()
+
+    cmd := exec.Command("rm", "-f", ".status.*")
+    cmd.Run()
 }

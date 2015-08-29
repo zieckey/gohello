@@ -107,12 +107,12 @@ func (ps *ProcessStatus) OnFileProcessingFinished(path string, startProcessing t
     t.End = time.Now()
     ps.processedFiles[path] = t
 
-    w := bufio.NewWriter(ps.statusFileFp)
+    w := ps.statusFileFp
     w.WriteString(t.Start.Format("2006/01/02-15:04:05.9999 "))
     w.WriteString(t.End.Format("2006/01/02-15:04:05.9999 "))
     w.WriteString(path)
     w.WriteString("\n")
-    w.Flush()
+    w.Sync()
 }
 
 func (ps *ProcessStatus) OnFileDeleted(path string) {
@@ -142,7 +142,6 @@ func (ss StringArray) Swap(i, j int) {
 
 
 func (ps *ProcessStatus) saveAll() error {
-    log.Println("==========================================")
     bakFilePath := ps.statusFile + ".bak." + strconv.FormatInt(time.Now().UnixNano(), 10)
     fp, err := os.OpenFile(bakFilePath, os.O_CREATE | os.O_RDWR, 0755)
     if err != nil {
@@ -156,19 +155,21 @@ func (ps *ProcessStatus) saveAll() error {
     _, err = ps.statusFileFp.Seek(0, os.SEEK_SET)
     if err != nil {
         log.Printf("Seek <%s> failed : %v\n", ps.statusFile, err.Error())
+        return err
     }
     err = ps.statusFileFp.Truncate(0)
     if err != nil {
         log.Printf("Truncate <%s> failed : %v\n", ps.statusFile, err.Error())
+        return err
     }
-    stat, err := ps.statusFileFp.Stat()
-    log.Printf("%v len=%v", stat.Name(), stat.Size())
+    //stat, err := ps.statusFileFp.Stat()
+    //log.Printf("%v len=%v", stat.Name(), stat.Size())
     var files StringArray
     for k, _ := range ps.processedFiles {
         files = append(files, k)
     }
     sort.Sort(files)
-    log.Print(files)
+    //log.Print(files)
 
     w := ps.statusFileFp
     for _, f := range files {
@@ -177,7 +178,7 @@ func (ps *ProcessStatus) saveAll() error {
             w.WriteString(t.End.Format("2006/01/02-15:04:05.9999 "))
             w.WriteString(f)
             w.WriteString("\n")
-            log.Printf("Write <%v> to status file\n", f)
+            //log.Printf("Write <%v> to status file\n", f)
         }
     }
     w.Sync()

@@ -3,13 +3,13 @@ package freader
 import (
     "github.com/howeyc/fsnotify"
     "log"
-    "os"
     "strings"
 )
 
 type Dispatcher struct {
     dirs    []string
     watcher *fsnotify.Watcher
+    status *ProcessStatus
 }
 
 func NewDispatcher(dir string) (d *Dispatcher, err error) {
@@ -19,19 +19,18 @@ func NewDispatcher(dir string) (d *Dispatcher, err error) {
         log.Fatal(err)
     }
 
-    d.dirs = strings.Split(dir, ",")
+    dirs := strings.Split(dir, ",")
+    for _, v := range dirs {
+        d.dirs = append(d.dirs, GetAbsPath(v))
+    }
+    log.Println(d.dirs)
+    d.status, err = NewProcessStatus(*statusFile)
+    if err != nil {
+        log.Fatal(err)
+    }
     return d, err
 }
 
-// IsDir returns true if given path is a directory,
-// or returns false when it's a file or does not exist.
-func IsDir(dir string) bool {
-    f, e := os.Stat(dir)
-    if e != nil {
-        return false
-    }
-    return f.IsDir()
-}
 
 func (d *Dispatcher) OnCreate(ev *fsnotify.FileEvent) {
     if IsDir(ev.Name) {
@@ -72,7 +71,7 @@ func (d *Dispatcher) Run() {
     for _, f := range d.dirs {
         err := d.watcher.Watch(f)
         if err != nil {
-            log.Fatal(err)
+            log.Fatal("Watch event of " + f + " FAILED: " + err.Error())
         }
     }
 
