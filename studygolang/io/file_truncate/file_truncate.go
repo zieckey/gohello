@@ -4,6 +4,7 @@ import (
     "strconv"
     "time"
     "flag"
+    "log"
 )
 
 func main() {
@@ -15,6 +16,9 @@ func main() {
 
     if *trunclen >= 0 {
         fp.Truncate(int64(*trunclen))
+
+        stat, _ := fp.Stat()
+        log.Printf("%v len=%v", stat.Name(), stat.Size())
     }
 
 
