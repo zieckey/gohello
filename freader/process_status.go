@@ -8,6 +8,7 @@ import (
     "strings"
     "sort"
     "strconv"
+    "log"
 )
 
 type FileProcessingTime struct {
@@ -43,7 +44,7 @@ func NewProcessStatus(statusFile string) (ps *ProcessStatus, err error) {
     ps.processedFiles = make(map[string]FileProcessingTime)
 
     if IsExist(statusFile) {
-        ps.statusFileFp, err = os.OpenFile(statusFile, os.O_RDWR | os.O_APPEND, 0755)
+        ps.statusFileFp, err = os.OpenFile(statusFile, os.O_RDWR, 0755)
         if err != nil {
             fmt.Printf("open status file <%v> failed : %v\n", err.Error())
             return nil, err
@@ -51,6 +52,7 @@ func NewProcessStatus(statusFile string) (ps *ProcessStatus, err error) {
         if err = ps.parse(); err != nil {
             return nil, err
         }
+        ps.statusFileFp.Seek(0, os.SEEK_END)
     } else {
         ps.statusFileFp, err = os.OpenFile(statusFile, os.O_CREATE | os.O_RDWR, 0755)
         if err != nil {
@@ -70,27 +72,31 @@ func (ps *ProcessStatus) parse() error {
     r := bufio.NewReader(ps.statusFileFp)
     for {
         line, err := r.ReadString('\n')
-        if len(line) > 0 {
-            line = strings.TrimSpace(line)
-            var start,end,path string
-            fmt.Sscanf(line, "%s %s %s", &start, &end, &path)
-            var t FileProcessingTime
-            t.Start, err = time.Parse("2006/01/02-15:04:05.9999", start)
-            if err != nil {
-                return fmt.Errorf("ERROR line <%v> %v", line, err.Error())
-            }
-            t.End, err = time.Parse("2006/01/02-15:04:05.9999", end)
-            if err != nil {
-                return fmt.Errorf("ERROR line <%v> %v", line, err.Error())
-            }
-            if len(path) == 0 {
-                return fmt.Errorf("ERROR line <%v>, path empty", line)
-            }
-            ps.processedFiles[path] = t
-        }
+
         if err == io.EOF {
             break
         }
+
+        if len(line) == 0 {
+            continue
+        }
+
+        line = strings.TrimSpace(line)
+        var start,end,path string
+        fmt.Sscanf(line, "%s %s %s", &start, &end, &path)
+        var t FileProcessingTime
+        t.Start, err = time.Parse("2006/01/02-15:04:05.9999", start)
+        if err != nil {
+            return fmt.Errorf("ERROR line <%v> %v", line, err.Error())
+        }
+        t.End, err = time.Parse("2006/01/02-15:04:05.9999", end)
+        if err != nil {
+            return fmt.Errorf("ERROR line <%v> %v", line, err.Error())
+        }
+        if len(path) == 0 {
+            return fmt.Errorf("ERROR line <%v>, path empty", line)
+        }
+        ps.processedFiles[path] = t
     }
     return nil
 }
@@ -114,9 +120,8 @@ func (ps *ProcessStatus) OnFileDeleted(path string) {
 }
 
 func (ps *ProcessStatus) Close()  {
-    ps.statusFileFp.Close()
-    tmp := ps.statusFile + ".tmp." + strconv.FormatInt(time.Now().UnixNano(), 10)
-    if err := ps.saveAllTo(tmp); err != nil {
+    defer ps.statusFileFp.Close()
+    if err := ps.saveAll(); err != nil {
         panic(err.Error())
     } // flush all data to files
 }
@@ -126,6 +131,7 @@ type StringArray []string
 func (ss StringArray) Len() int {
     return len(ss)
 }
+
 func (ss StringArray) Less(i, j int) bool {
     return ss[i] < ss[j]
 }
@@ -135,38 +141,45 @@ func (ss StringArray) Swap(i, j int) {
 }
 
 
-func (ps *ProcessStatus) saveAllTo(tmpFilePath string) error {
-    fp, err := os.OpenFile(tmpFilePath, os.O_CREATE | os.O_RDWR, 0755)
+func (ps *ProcessStatus) saveAll() error {
+    log.Println("==========================================")
+    bakFilePath := ps.statusFile + ".bak." + strconv.FormatInt(time.Now().UnixNano(), 10)
+    fp, err := os.OpenFile(bakFilePath, os.O_CREATE | os.O_RDWR, 0755)
     if err != nil {
         return err
     }
-    defer fp.Close()
+    ps.statusFileFp.Seek(0, os.SEEK_SET)
+    io.Copy(fp, ps.statusFileFp)
+    fp.Sync()
+    fp.Close()
+
+    _, err = ps.statusFileFp.Seek(0, os.SEEK_SET)
+    if err != nil {
+        log.Printf("Seek <%s> failed : %v\n", ps.statusFile, err.Error())
+    }
+    err = ps.statusFileFp.Truncate(0)
+    if err != nil {
+        log.Printf("Truncate <%s> failed : %v\n", ps.statusFile, err.Error())
+    }
+    stat, err := ps.statusFileFp.Stat()
+    log.Printf("%v len=%v", stat.Name(), stat.Size())
     var files StringArray
     for k, _ := range ps.processedFiles {
         files = append(files, k)
     }
     sort.Sort(files)
+    log.Print(files)
 
-    w := bufio.NewWriter(fp)
+    w := ps.statusFileFp
     for _, f := range files {
         if t, ok := ps.processedFiles[f]; ok {
             w.WriteString(t.Start.Format("2006/01/02-15:04:05.9999 "))
             w.WriteString(t.End.Format("2006/01/02-15:04:05.9999 "))
             w.WriteString(f)
             w.WriteString("\n")
+            log.Printf("Write <%v> to status file\n", f)
         }
     }
-    w.Flush()
-
-    bak := ps.statusFile + ".bak." + strconv.FormatInt(time.Now().UnixNano(), 10)
-    err = os.Rename(ps.statusFile, bak)
-    if err != nil {
-        return fmt.Errorf("os.Rename <%v> to <%v> failed : %v", ps.statusFile, bak, err.Error())
-    }
-    os.Rename(tmpFilePath, ps.statusFile)
-    if err != nil {
-        return fmt.Errorf("os.Rename <%v> to <%v> failed : %v", tmpFilePath, ps.statusFile, err.Error())
-    }
-
+    w.Sync()
     return nil
 }

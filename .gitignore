@@ -10,3 +10,4 @@ cgo/cgohello4/cgohello4
 cgo/cgohello3/cgohello3
 tools/randfile/*.gz
 tools/randfile/*.txt
+freader/.status.*
