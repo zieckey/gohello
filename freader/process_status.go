@@ -91,8 +91,6 @@ func (ps *ProcessStatus) Close()  {
     } // flush all data to files
 }
 
-
-
 func (ps *ProcessStatus) parse() error {
     r := bufio.NewReader(ps.statusFileFp)
     for {

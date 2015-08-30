@@ -50,9 +50,8 @@ func (r *PTailReader) ReadFile(file string, pos int) (err error) {
     return nil
 }
 
-func (r *PTailReader) ReadLine() (line string, err error) {
-    //glog.Infof("ReadString from %v", r.path)
-    line, err = r.r.ReadString('\n')
+func (r *PTailReader) ReadLine() (line []byte, err error) {
+    line, err = r.r.ReadBytes('\n')
     if len(line) > 0 && line[len(line) - 1] == '\n' {
         line = line[:len(line) - 1]
     }

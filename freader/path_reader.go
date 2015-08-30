@@ -91,6 +91,7 @@ func createReader() FileReader {
 
 func (r *PathReader) StartToRead() (err error) {
     glog.Infof("Starting to read files ...")
+    startTime := time.Now()
     for {
         if r.files.Len() == 0 {
             glog.Infof("No files. Waiting ...")
@@ -113,15 +114,16 @@ func (r *PathReader) StartToRead() (err error) {
             continue
         }
 
-        startTime := time.Now()
         r.fr.ReadFile(file, 0)
+        if len(r.currentReadingFile) > 0 {
+            dispatcher.status.OnFileProcessingFinished(r.currentReadingFile, startTime)
+        }
+        startTime = time.Now()
         r.currentReadingFile = file
 
         for {
             line, err := r.fr.ReadLine()
             if err == io.EOF {
-                dispatcher.status.OnFileProcessingFinished(file, startTime)
-
                 // there are still files which are ready to be processed
                 if r.files.Len() > 0 {
                     break
@@ -135,7 +137,7 @@ func (r *PathReader) StartToRead() (err error) {
                 break
             }
 
-            glog.Infof("Read a new line:<%s>", line)
+            glog.Infof("Read a new line:<%s>", string(line))
             //TODO process the new line reading from data file
         }
     }
