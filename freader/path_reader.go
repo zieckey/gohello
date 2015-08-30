@@ -83,7 +83,9 @@ func createReader() FileReader {
     if *reader_type == "PTailReader" {
         return NewPTailReader()
     } else if *reader_type == "GzipReader" {
-        //TODO
+        return NewGzipReader()
+    } else if *reader_type == "PcapReader" {
+
     }
 
     return nil
@@ -108,7 +110,6 @@ func (r *PathReader) StartToRead() (err error) {
         r.mutex.Unlock()
 
         file, ok := e.Value.(string)
-        glog.Infof("Processing file %v", file)
         if !ok {
             glog.Errorf("Get element from file List failed.")
             continue
@@ -116,14 +117,26 @@ func (r *PathReader) StartToRead() (err error) {
 
         r.fr.ReadFile(file, 0)
         if len(r.currentReadingFile) > 0 {
+            glog.Infof("Finished to process file %v", r.currentReadingFile)
             dispatcher.status.OnFileProcessingFinished(r.currentReadingFile, startTime)
         }
         startTime = time.Now()
         r.currentReadingFile = file
+        glog.Infof("Begin to process file %v", file)
 
+        var lastLine []byte
         for {
             line, err := r.fr.ReadLine()
+            //glog.Infof("ReadLine: lastLine=<%s> current-read=<%s> <%v>", string(lastLine), string(line), err)
+            if len(lastLine) > 0 {
+                line = append(lastLine, line...)
+            }
+
             if err == io.EOF {
+                if len(line) > 0 {
+                    lastLine = line
+                }
+
                 // there are still files which are ready to be processed
                 if r.files.Len() > 0 {
                     break
@@ -132,13 +145,15 @@ func (r *PathReader) StartToRead() (err error) {
                 // no more files. we wait this file to be updated or wait new file created
                 glog.Infof("no more files, we wait this file <%v> to be updated. Waiting ...", file)
                 r.Wait()
+                continue
             } else if err != nil {
                 glog.Errorf("Read data from <%s> failed : %v", file, err.Error())
                 break
+            } else {
+                lastLine = []byte{}
             }
 
-            glog.Infof("Read a new line:<%s>", string(line))
-            //TODO process the new line reading from data file
+            dispatcher.textModule.OnRecord(line)
         }
     }
 }

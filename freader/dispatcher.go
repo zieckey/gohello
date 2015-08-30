@@ -5,6 +5,7 @@ import (
     "log"
     "sync"
     "github.com/golang/glog"
+    "path/filepath"
 )
 
 type Dispatcher struct {
@@ -12,6 +13,7 @@ type Dispatcher struct {
     watcher *fsnotify.Watcher
     status *ProcessStatus
     h *FilesHandler
+    textModule TextModule
 }
 
 func NewDispatcher(dir string) (d *Dispatcher, err error) {
@@ -33,6 +35,7 @@ func NewDispatcher(dir string) (d *Dispatcher, err error) {
         log.Fatal(err)
     }
 
+    d.textModule = &DefaultTextModule{}
     return d, err
 }
 
@@ -42,7 +45,11 @@ func (d *Dispatcher) onCreate(ev *fsnotify.FileEvent) {
         d.watcher.Watch(ev.Name)
         //Ignore this : FIXME if we renamed ev.Name latterly, we should add the new name to the watching list.
     } else {
-        d.h.OnFileCreated(ev.Name)
+        if ok, _ := filepath.Match(*filePattern, filepath.Base(ev.Name)); ok {
+            d.h.OnFileCreated(ev.Name)
+        } else {
+            glog.Infof("Create a file <%v> but does not match the file pattern <%v>", ev.Name, *filePattern)
+        }
     }
 }
 
@@ -97,3 +104,8 @@ func (d *Dispatcher) Run() {
 func (d *Dispatcher) Close() {
     d.watcher.Close()
 }
+
+func (d *Dispatcher) RegisterTextModule(m TextModule) {
+    d.textModule = m
+}
+

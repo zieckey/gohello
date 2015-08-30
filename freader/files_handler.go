@@ -48,13 +48,15 @@ func (h *FilesHandler) Run() {
         log.Fatal("LoopupFiles <%s> with pathern <%s> failed : %v\n", dir, *filePattern, err.Error())
     }
 
+    glog.Infof("existing files: %v", ff)
     for _, f := range ff {
         if !dispatcher.status.IsProcessed(f) {
             h.OnFileCreated(f)
+        } else {
+            glog.Infof("Skip processed file: %v", f)
         }
     }
-    glog.Infof("existing files: %v", ff)
-    //TODO
+
     if h.priorityLevel <= 0 { // no priority
         r, _ := h.readers[h.dir]
         r.StartToRead()
