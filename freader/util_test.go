@@ -1,7 +1,6 @@
-package freader_test
+package freader
 
 import (
-    . "github.com/zieckey/gohello/freader"
     "testing"
     "github.com/bmizerany/assert"
     "runtime"
@@ -18,4 +17,15 @@ func TestGetAbsPath(t *testing.T) {
         assert.Equal(t, filepath.IsAbs(dir), true)
     }
     assert.Equal(t, GetAbsPath(dir), dir)
+}
+
+func TestLookupFiles(t *testing.T) {
+    files, _ := LookupFiles(".", "*.go")
+    found := false
+    for _, f := range files {
+        if f == "xmain.go" {
+            found = true
+        }
+    }
+    assert.Equal(t, found, true)
 }

@@ -19,7 +19,7 @@ type FileProcessingTime struct {
 type ProcessStatus struct {
     processedFiles map[string]FileProcessingTime    // The processed files and the time when starting to process and end
 
-    // The content format of status file :
+    // The content format of the status file :
     //  It is a text file. Every line represents a processed file.
     //  The line has 3 part
     //      1. start processing date time
@@ -29,13 +29,6 @@ type ProcessStatus struct {
     statusFile string       // The path of the status file which used to store the status information of all processed files
     statusFileFp *os.File   // The file pointer to the status file
 
-}
-
-// IsExist checks whether a file or directory exists.
-// It returns false when the file or directory does not exist.
-func IsExist(path string) bool {
-    _, err := os.Stat(path)
-    return err == nil || os.IsExist(err)
 }
 
 func NewProcessStatus(statusFile string) (ps *ProcessStatus, err error) {
@@ -64,9 +57,41 @@ func NewProcessStatus(statusFile string) (ps *ProcessStatus, err error) {
     return ps, nil
 }
 
+func (ps *ProcessStatus) IsProcessed(file string) bool {
+    _, ok := ps.processedFiles[file]
+    return ok
+}
+
 func (ps *ProcessStatus) GetProcessedFiles() map[string]FileProcessingTime {
     return ps.processedFiles
 }
+
+func (ps *ProcessStatus) OnFileProcessingFinished(path string, startProcessing time.Time) {
+    var t FileProcessingTime
+    t.Start = startProcessing
+    t.End = time.Now()
+    ps.processedFiles[path] = t
+
+    w := ps.statusFileFp
+    w.WriteString(t.Start.Format("2006/01/02-15:04:05.9999 "))
+    w.WriteString(t.End.Format("2006/01/02-15:04:05.9999 "))
+    w.WriteString(path)
+    w.WriteString("\n")
+    w.Sync()
+}
+
+func (ps *ProcessStatus) OnFileDeleted(path string) {
+    delete(ps.processedFiles, path)
+}
+
+func (ps *ProcessStatus) Close()  {
+    defer ps.statusFileFp.Close()
+    if err := ps.saveAll(); err != nil {
+        panic(err.Error())
+    } // flush all data to files
+}
+
+
 
 func (ps *ProcessStatus) parse() error {
     r := bufio.NewReader(ps.statusFileFp)
@@ -99,31 +124,6 @@ func (ps *ProcessStatus) parse() error {
         ps.processedFiles[path] = t
     }
     return nil
-}
-
-func (ps *ProcessStatus) OnFileProcessingFinished(path string, startProcessing time.Time) {
-    var t FileProcessingTime
-    t.Start = startProcessing
-    t.End = time.Now()
-    ps.processedFiles[path] = t
-
-    w := ps.statusFileFp
-    w.WriteString(t.Start.Format("2006/01/02-15:04:05.9999 "))
-    w.WriteString(t.End.Format("2006/01/02-15:04:05.9999 "))
-    w.WriteString(path)
-    w.WriteString("\n")
-    w.Sync()
-}
-
-func (ps *ProcessStatus) OnFileDeleted(path string) {
-    delete(ps.processedFiles, path)
-}
-
-func (ps *ProcessStatus) Close()  {
-    defer ps.statusFileFp.Close()
-    if err := ps.saveAll(); err != nil {
-        panic(err.Error())
-    } // flush all data to files
 }
 
 type StringArray []string

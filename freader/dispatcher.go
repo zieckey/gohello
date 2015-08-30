@@ -3,61 +3,69 @@ package freader
 import (
     "github.com/howeyc/fsnotify"
     "log"
-    "strings"
+    "sync"
+    "github.com/golang/glog"
 )
 
 type Dispatcher struct {
-    dirs    []string
+    dir    string
     watcher *fsnotify.Watcher
     status *ProcessStatus
+    h *FilesHandler
 }
 
 func NewDispatcher(dir string) (d *Dispatcher, err error) {
+    glog.Infof("NewDispatcher")
     d = &Dispatcher{}
     d.watcher, err = fsnotify.NewWatcher()
     if err != nil {
         log.Fatal(err)
     }
 
-    dirs := strings.Split(dir, ",")
-    for _, v := range dirs {
-        d.dirs = append(d.dirs, GetAbsPath(v))
-    }
-    log.Println(d.dirs)
+    d.dir = dir
     d.status, err = NewProcessStatus(*statusFile)
     if err != nil {
         log.Fatal(err)
     }
+
+    d.h, err = NewFilesHandler(dir)
+    if err != nil {
+        log.Fatal(err)
+    }
+
     return d, err
 }
 
 
-func (d *Dispatcher) OnCreate(ev *fsnotify.FileEvent) {
+func (d *Dispatcher) onCreate(ev *fsnotify.FileEvent) {
     if IsDir(ev.Name) {
         d.watcher.Watch(ev.Name)
-        //TODO if we renamed ev.Name latterly, we should add the new name to the watching list
+        //Ignore this : FIXME if we renamed ev.Name latterly, we should add the new name to the watching list.
+    } else {
+        d.h.OnFileCreated(ev.Name)
     }
 }
 
-func (d *Dispatcher) OnDelete(ev *fsnotify.FileEvent) {
-
+func (d *Dispatcher) onDelete(ev *fsnotify.FileEvent) {
+    d.status.OnFileDeleted(ev.Name)
 }
 
-func (d *Dispatcher) OnModify(ev *fsnotify.FileEvent) {
-
+func (d *Dispatcher) onModify(ev *fsnotify.FileEvent) {
+    d.h.OnFileModified(ev.Name)
 }
 
-func (d *Dispatcher) WatchEvent() {
+func (d *Dispatcher) watchEvent(wg *sync.WaitGroup) {
+    wg.Done()
     for {
         select {
         case ev := <-d.watcher.Event:
-            log.Println("event:", ev, " name=", ev.Name)
+            glog.Info("event:", ev, " name=", ev.Name)
             if ev.IsCreate() {
-                d.OnCreate(ev)
+                d.onCreate(ev)
             } else if ev.IsDelete() {
-                d.OnDelete(ev)
+                d.onDelete(ev)
             } else if ev.IsModify() {
-                d.OnModify(ev)
+                d.onModify(ev)
             } else {
                 log.Printf("don't care")
             }
@@ -68,14 +76,21 @@ func (d *Dispatcher) WatchEvent() {
 }
 
 func (d *Dispatcher) Run() {
-    for _, f := range d.dirs {
-        err := d.watcher.Watch(f)
-        if err != nil {
-            log.Fatal("Watch event of " + f + " FAILED: " + err.Error())
-        }
+    glog.Infof("Watching <%v>", dir)
+    err := d.watcher.Watch(d.dir)
+    if err != nil {
+        log.Fatal("Watch event of " + d.dir + " FAILED: " + err.Error())
     }
 
-    d.WatchEvent()
+    //start to watch the file event and wait the goroutine started
+    var wg sync.WaitGroup
+    wg.Add(1)
+    go d.watchEvent(&wg)
+    wg.Wait()
+
+    //start file handler to run
+    d.h.Run()
+
     d.Close()
 }
 

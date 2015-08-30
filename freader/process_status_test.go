@@ -1,6 +1,5 @@
-package freader_test
+package freader
 import (
-    . "github.com/zieckey/gohello/freader"
     "testing"
     "fmt"
     "github.com/bmizerany/assert"
