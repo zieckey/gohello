@@ -25,7 +25,7 @@ func NewGzipFileReader() *GzipFileReader {
     return br
 }
 
-func (r *GzipFileReader) ReadFile(file string, pos int) (err error) {
+func (r *GzipFileReader) LoadFile(file string, pos int) (err error) {
     if r.fp != nil {
         glog.Infof("Finished to process file %v", r.path)
         r.fp.Close()

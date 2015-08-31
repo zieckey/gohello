@@ -38,7 +38,6 @@ func IsDir(dir string) bool {
     return f.IsDir()
 }
 
-
 func LookupFiles(dir string, pattern string) ([]string, error) {
     var files []string = make([]string, 0, 5)
 

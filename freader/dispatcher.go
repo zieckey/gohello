@@ -14,9 +14,19 @@ type Dispatcher struct {
     status *ProcessStatus
     h *FilesHandler
     textModule TextModule
+    pcapModule PcapModule
 }
 
-func NewDispatcher(dir string) (d *Dispatcher, err error) {
+
+var dispatcher *Dispatcher
+func NewDispatcher() (*Dispatcher, error) {
+    var err error
+    dispatcher, err = newDispatcher(*dir)
+    return dispatcher, err
+}
+
+
+func newDispatcher(dir string) (d *Dispatcher, err error) {
     glog.Infof("NewDispatcher")
     d = &Dispatcher{}
     d.watcher, err = fsnotify.NewWatcher()
@@ -26,7 +36,7 @@ func NewDispatcher(dir string) (d *Dispatcher, err error) {
 
     d.dir = dir
     d.status, err = NewProcessStatus(*statusFile)
-    if err != nil {
+    if err != nil || d.status == nil {
         log.Fatal(err)
     }
 
@@ -36,6 +46,7 @@ func NewDispatcher(dir string) (d *Dispatcher, err error) {
     }
 
     d.textModule = &DefaultTextModule{}
+    d.pcapModule = &DefaultPcapModule{}
     return d, err
 }
 
@@ -83,7 +94,7 @@ func (d *Dispatcher) watchEvent(wg *sync.WaitGroup) {
 }
 
 func (d *Dispatcher) Run() {
-    glog.Infof("Watching <%v>", dir)
+    glog.Infof("Watching <%v>", d.dir)
     err := d.watcher.Watch(d.dir)
     if err != nil {
         log.Fatal("Watch event of " + d.dir + " FAILED: " + err.Error())
@@ -108,4 +119,9 @@ func (d *Dispatcher) Close() {
 func (d *Dispatcher) RegisterTextModule(m TextModule) {
     d.textModule = m
 }
+
+func (d *Dispatcher) RegisterPcapModule(m PcapModule) {
+    d.pcapModule = m
+}
+
 

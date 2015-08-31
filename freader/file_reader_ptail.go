@@ -23,7 +23,7 @@ func NewPTailFileReader() *PTailFileReader {
     return br
 }
 
-func (r *PTailFileReader) ReadFile(file string, pos int) (err error) {
+func (r *PTailFileReader) LoadFile(file string, pos int) (err error) {
     if r.fp != nil {
         r.fp.Close()
         r.fp = nil
