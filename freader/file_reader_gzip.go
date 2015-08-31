@@ -4,17 +4,19 @@ import (
     "github.com/golang/glog"
     "bufio"
     "bytes"
+    "compress/gzip"
 )
 
-type PTailReader struct {
+type GzipFileReader struct {
     path string
     pos int
     fp *os.File
     r* bufio.Reader // The reader of os.File fp
+    gr* gzip.Reader
 }
 
-func NewPTailReader() *PTailReader {
-    br := &PTailReader{
+func NewGzipFileReader() *GzipFileReader {
+    br := &GzipFileReader{
         path : "",
         pos:0,
         fp:nil,
@@ -23,8 +25,9 @@ func NewPTailReader() *PTailReader {
     return br
 }
 
-func (r *PTailReader) ReadFile(file string, pos int) (err error) {
+func (r *GzipFileReader) ReadFile(file string, pos int) (err error) {
     if r.fp != nil {
+        glog.Infof("Finished to process file %v", r.path)
         r.fp.Close()
         r.fp = nil
     }
@@ -42,15 +45,20 @@ func (r *PTailReader) ReadFile(file string, pos int) (err error) {
     }
 
     if r.r == nil {
-        r.r = bufio.NewReader(r.fp)
+        r.gr, err = gzip.NewReader(r.fp)
+        if err != nil {
+            return err
+        }
+        r.r = bufio.NewReader(r.gr)
     } else {
-        r.r.Reset(r.fp)
+        r.gr.Reset(r.fp)
+        r.r.Reset(r.gr)
     }
 
     return nil
 }
 
-func (r *PTailReader) ReadLine() (line []byte, err error) {
+func (r *GzipFileReader) ReadLine() (line []byte, err error) {
     line, err = r.r.ReadBytes('\n')
     //glog.Infof("len(line)=%v %v", len(line), base64.StdEncoding.EncodeToString(line))
     line = bytes.TrimRight(line, "\r\n")
@@ -58,6 +66,6 @@ func (r *PTailReader) ReadLine() (line []byte, err error) {
     return line, err
 }
 
-func (r *PTailReader) GetPos() int {
+func (r *GzipFileReader) GetPos() int {
     return r.pos
 }

@@ -7,7 +7,7 @@ import (
     "time"
 )
 
-type PathReader struct {
+type DirReader struct {
     dir string
 
 
@@ -22,8 +22,8 @@ type PathReader struct {
     files *list.List // The files to be reading
 }
 
-func NewPathReader(dir string) (*PathReader, error) {
-    r := &PathReader{}
+func NewPathReader(dir string) (*DirReader, error) {
+    r := &DirReader{}
     r.dir = dir
     r.waiting = false
     r.files = list.New()
@@ -41,7 +41,7 @@ func NewPathReader(dir string) (*PathReader, error) {
 //    return 0, nil
 //}
 
-func (r *PathReader) Append(file string) (err error) {
+func (r *DirReader) add(file string) (err error) {
     r.mutex.Lock()
     defer r.mutex.Unlock()
     r.files.PushBack(file)
@@ -53,7 +53,7 @@ const (
     kCreate int = 2
 )
 
-func (r *PathReader) OnFileModified(file string) (err error) {
+func (r *DirReader) OnFileModified(file string) (err error) {
     if r.currentReadingFile == file && r.waiting {
         glog.Infof("send kModify signal")
         r.wakeup <- kModify
@@ -63,8 +63,8 @@ func (r *PathReader) OnFileModified(file string) (err error) {
     return nil
 }
 
-func (r *PathReader) OnFileCreated(file string) (err error) {
-    r.Append(file)
+func (r *DirReader) OnFileCreated(file string) (err error) {
+    r.add(file)
     if r.waiting && r.files.Len() == 1 {
         /*
         r.waiting : we will send a signal only if the goroutine is waiting
@@ -81,9 +81,9 @@ func (r *PathReader) OnFileCreated(file string) (err error) {
 func createReader() FileReader {
     //GzipReader, PTailReader
     if *reader_type == "PTailReader" {
-        return NewPTailReader()
+        return NewPTailFileReader()
     } else if *reader_type == "GzipReader" {
-        return NewGzipReader()
+        return NewGzipFileReader()
     } else if *reader_type == "PcapReader" {
 
     }
@@ -91,7 +91,7 @@ func createReader() FileReader {
     return nil
 }
 
-func (r *PathReader) StartToRead() (err error) {
+func (r *DirReader) StartToRead() (err error) {
     glog.Infof("Starting to read files ...")
     startTime := time.Now()
     for {
@@ -99,7 +99,7 @@ func (r *PathReader) StartToRead() (err error) {
             glog.Infof("No files. Waiting ...")
             r.Wait()
             if r.files.Len() == 0 {
-                glog.Errorf("logic ERROR, but ignore it now, we should review the code logic.")
+                glog.Errorf("This is a logic ERROR, but we ignore it right now and lately we should review this code logic.")
                 continue
             }
         }
@@ -158,7 +158,7 @@ func (r *PathReader) StartToRead() (err error) {
     }
 }
 
-func (r *PathReader) Wait() int {
+func (r *DirReader) Wait() int {
     r.waiting = true
     event := <-r.wakeup
     r.waiting = false

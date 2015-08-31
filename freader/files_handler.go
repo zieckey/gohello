@@ -11,7 +11,7 @@ type FilesHandler struct {
     dir string
     priorityLevel int
 
-    readers map[string/*path dir*/]*PathReader
+    readers map[string/*path dir*/]*DirReader
     paths []string
 }
 
@@ -19,7 +19,7 @@ func NewFilesHandler(dir string) (h *FilesHandler, err error) {
     h = &FilesHandler{}
     h.dir = dir
     h.priorityLevel = *priorityLevel
-    h.readers = make(map[string/*path*/]*PathReader)
+    h.readers = make(map[string/*path*/]*DirReader)
 
     if h.priorityLevel <= 0 {
         h.readers[dir], err = NewPathReader(dir)
