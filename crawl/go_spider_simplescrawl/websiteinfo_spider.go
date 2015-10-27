@@ -14,7 +14,7 @@ import (
 
 var result = make(map[string]map[string]string)
 
-type MyPageProcesser struct {
+type MyPageProcesser struct {  
 }
 
 func NewMyPageProcesser() *MyPageProcesser {
