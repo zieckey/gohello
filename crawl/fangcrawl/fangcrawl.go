@@ -153,10 +153,10 @@ func (this *HousePageProcesser) SaveData() {
     for _, p := range this.parser {
         path := filepath.Join(DataPath, p.Name(), htmlparser.LastDay() + ".json")
         err := ioutil.WriteFile(path, []byte(p.ToJSON()), 0755)
-        if err != nil {
-            log.Printf("writer JSON data to <%v> OK", path)
+        if err = nil {
+            log.Printf("WriteFile to <%v> OK", path)
         } else {
-            log.Printf("WriteFile to <%v> failed : %v", path, err.Error())
+            log.Printf("writer JSON data to <%v> OK", path)
         }
     }
 }
