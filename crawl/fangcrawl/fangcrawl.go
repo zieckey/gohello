@@ -25,6 +25,11 @@ func NewHousePageProcesser() *HousePageProcesser {
     return m
 }
 
+
+func (this *HousePageProcesser) Finish() {
+
+}
+
 func (this *HousePageProcesser) Process(p *page.Page) {
     if !p.IsSucc() {
         println(p.Errormsg())
@@ -153,7 +158,7 @@ func (this *HousePageProcesser) SaveData() {
     for _, p := range this.parser {
         path := filepath.Join(DataPath, p.Name(), htmlparser.LastDay() + ".json")
         err := ioutil.WriteFile(path, []byte(p.ToJSON()), 0755)
-        if err = nil {
+        if err == nil {
             log.Printf("WriteFile to <%v> OK", path)
         } else {
             log.Printf("writer JSON data to <%v> OK", path)
