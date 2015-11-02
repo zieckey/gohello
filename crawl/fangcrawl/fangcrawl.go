@@ -9,9 +9,11 @@ import (
     "./htmlparser"
     "log"
     "net/http"
-    "runtime"
     "path/filepath"
     "io/ioutil"
+    "flag"
+    "os"
+    "runtime"
 )
 
 type HousePageProcesser struct {
@@ -49,132 +51,58 @@ func (this *HousePageProcesser) Process(p *page.Page) {
         return
     }
 
-    fmt.Printf("%v\n", parser.ToJSON())
-
-//    jForwardDeliveryHhousing := simplejson.New() // 期房
-//    jReadyHouse := simplejson.New() // 现房(新房)
-//    jSecondHandHouse := simplejson.New()    // 存量房（二手房）
-//    jday := simplejson.New()
-//    jmonth := simplejson.New()
-//
-//    //TODO 检查 html parsing 的返回值是否正确，如果不正确报警
-//    // 期房
-//    t := query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_totalCount']").Text()
-//    jForwardDeliveryHhousing.Set("当前可售期房总套数", t)
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_residenceCount']").Text()
-//    jForwardDeliveryHhousing.Set("当前可售住宅套数", t)
-//
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_totalCount4']").Text()
-//    jForwardDeliveryHhousing.Set("期房网上签约总套数", t)
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_residenceCount4']").Text()
-//    jForwardDeliveryHhousing.Set("期房网上签约住宅套数", t)
-//
-//    jday.Set("期房", jForwardDeliveryHhousing)
-//
-//    // 存量房
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_totalCount']").Text()
-//    jSecondHandHouse.Set("当前可售存量房总套数", t)
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_residenceCount']").Text()
-//    jSecondHandHouse.Set("当前可售存量房住宅套数", t)
-//
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_totalCount4']").Text()
-//    jSecondHandHouse.Set("存量房网上签约总套数", t)
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_residenceCount4']").Text()
-//    jSecondHandHouse.Set("存量房网上签约住宅套数", t)
-//
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_totalCount2']").Text()
-//    jSecondHandHouse.Set("新发布房源总套数", t)
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_residenceCount2']").Text()
-//    jSecondHandHouse.Set("新发布房源住宅套数", t)
-//
-//    jday.Set("存量房", jSecondHandHouse)
-//
-//    // 现房
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_residenceCount6']").Text()
-//    jReadyHouse.Set("当前可售现房住宅套数", t)
-//
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_totalCount8']").Text()
-//    jReadyHouse.Set("现房网上签约总套数", t)
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_residenceCount8']").Text()
-//    jReadyHouse.Set("现房网上签约住宅套数", t)
-//
-//    jday.Set("现房", jReadyHouse)
-//
-//
-//    // 月批准预售许可证
-//    t = query.Find("div[class='cont_top_wrap'] td[id='ess_ctr5115_ContentPane'] span[id='ess_ctr5115_FDCJY_HouseTransactionStatist_residenceCount2']").Text()
-//    jmonth.Set("月批准预售许可证的住宅套数", t)
-//
-//    // 月度存量房网上签约
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_totalCount3']").Text()
-//    jmonth.Set("月度存量房网上签约总套数", t)
-//    t = query.Find("td[id='ess_ctr5112_ContentPane'] div[id='ess_ctr5112_ModuleContent'] span[id='ess_ctr5112_FDCJY_SignOnlineStatistics_residenceCount3']").Text()
-//    jmonth.Set("月度存量房网上签约住宅套数", t)
-//
-//    jresult := simplejson.New()
-//    jresult.Set(LastDay(), jday)
-//    jresult.Set(LastMonth(), jmonth)
-//
-//    jbuf, _ := jresult.EncodePretty()
-//    fmt.Println(string(jbuf))
+    fmt.Printf("%v\n", parser.ToJSON(true))
 }
 
-//func main() {
-//    sp := spider.NewSpider(NewMyPageProcesser(), "TaskName")
-//
-//    urls := []string{
-//        "http://www.bjjs.gov.cn/tabid/2167/default.aspx",
-//    }
-//
-//    var reqs []*request.Request
-//    for _, url := range urls {
-//        req := request.NewRequest(url, "html", "", "GET", "", nil, nil, nil, nil)
-//        req.GetHeader().Set("", "")
-//        reqs = append(reqs, req)
-//    }
-//    sp.SetThreadnum(2).GetAllByRequest(reqs)
-//}
-//// LastDay 返回昨天的日期字符串，例如"2015-10-27"
-//func LastDay() string {
-//    t := time.Now().Add(-24*time.Hour)
-//    s := fmt.Sprintf("%v-%v-%v", t.Year(), int(t.Month()), t.Day())
-//    return s
-//}
-//
-//// LastDay 返回上个月的日期字符串，例如"2015-10"
-//func LastMonth() string {
-//    t := time.Now()
-//    y := t.Year()
-//    m := int(t.Month()) - 1
-//    if m == 0 {
-//        m = 12
-//        y = y - 1
-//    }
-//    s := fmt.Sprintf("%v-%02d", y, m)
-//    return s
-//}
-
-func (this *HousePageProcesser) SaveData() {
+func (this *HousePageProcesser) SaveData(outputDir string) {
     for _, p := range this.parser {
-        path := filepath.Join(DataPath, p.Name(), htmlparser.LastDay() + ".json")
-        err := ioutil.WriteFile(path, []byte(p.ToJSON()), 0755)
+        outputDir = filepath.Join(outputDir, p.Name())
+        err := os.MkdirAll(outputDir, 0755)
+        if err == nil {
+            log.Printf("os.MkdirAll <%v> OK", outputDir)
+        } else {
+            log.Printf("os.MkdirAll <%v> failed: %s", outputDir, err.Error())
+        }
+        path := filepath.Join(outputDir, htmlparser.LastDay() + ".json")
+        err = ioutil.WriteFile(path, []byte(p.ToJSON(false)), 0755)
         if err == nil {
             log.Printf("WriteFile to <%v> OK", path)
         } else {
-            log.Printf("writer JSON data to <%v> OK", path)
+            log.Printf("writer JSON data to <%v> failed: %s", path, err.Error())
         }
+
+        //TODO only insert to beijing table
+        //dbutil.InsertToMySQL(p.ToJSON(false))
     }
 }
 
-var DataPath = "/home/weizili/fang"
-
+var defaultOutput = "/var/mysql_backups"
+var defaultLogFile = "/var/mysql_backups/crawling.log"
 func init() {
     if runtime.GOOS == "windows" {
-        DataPath = "e:/360yunpan/fangstat"
+        defaultOutput = "e:/1"
+        defaultLogFile = "e:/1/crawling.log"
     }
 }
 
 func main() {
+    var output *string = flag.String("output", defaultOutput, "The dir where to store the crawled output data ")
+    var logfile *string = flag.String("logfile", defaultLogFile, "The log file")
+    flag.Parse()
+
+    logf, err := os.OpenFile(*logfile, os.O_APPEND|os.O_CREATE, os.ModeAppend)
+    if err != nil {
+        log.Printf("os.OpenFile <%s> failed : %v", *logfile, err.Error())
+    }
+    log.SetOutput(logf)
+    log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime)
+
+    err = os.MkdirAll(*output, 0755)
+    if err != nil {
+        log.Printf("mkdir <%s> failed : %v", *output, err.Error())
+        os.Exit(-1)
+    }
+
     hpp := NewHousePageProcesser()
     sp := spider.NewSpider(hpp, "TaskName")
 
@@ -186,5 +114,5 @@ func main() {
         reqs = append(reqs, req)
     }
     sp.SetThreadnum(2).GetAllByRequest(reqs)
-    hpp.SaveData()
+    hpp.SaveData(*output)
 }
