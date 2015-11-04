@@ -13,14 +13,15 @@ import (
 
 func main() {
 	var input *string = flag.String("s", "", "The input json string")
+	var compact *bool = flag.Bool("c", false, "Compact output")
 	flag.Parse()
-	var istream io.Reader
+	var in io.Reader
 	if len(*input) > 0 {
-		istream = strings.NewReader(*input)
+		in = strings.NewReader(*input)
 	} else {
-		istream = bufio.NewReader(os.Stdin)
+		in = bufio.NewReader(os.Stdin)
 	}
-	body, err := ioutil.ReadAll(istream)
+	body, err := ioutil.ReadAll(in)
 	if err != nil && err != io.EOF {
 		fmt.Printf("ERROR : %v\ninput body:\n%v\n", err.Error(), string(body))
 		return
@@ -32,7 +33,13 @@ func main() {
         return
     }
 
-    pretty, err := js.EncodePretty()
-    fmt.Printf("%v\n", string(pretty))
+	var json []byte
+	if *compact {
+		json, err = js.Encode()
+	} else {
+		json, err = js.EncodePretty()
+	}
+
+    fmt.Printf("%v\n", string(json))
 }
 
