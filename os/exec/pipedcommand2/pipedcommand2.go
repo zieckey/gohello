@@ -7,20 +7,18 @@ import (
 )
 
 func main() {
-	bcCommand := exec.Command("bc", "-l")
-	mailStdin, err := bcCommand.StdinPipe()
-	err = bcCommand.Start()
+	wcCommand := exec.Command("wc", "-l")
+	mailStdin, err := wcCommand.StdinPipe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "The command failed to perform: %s (Command: %s, Arguments: %s)", err, bcCommand.Path, bcCommand.Args)
+		fmt.Fprintf(os.Stderr, "StdinPipe Get failed: %s (Command: %s, Arguments: %s)", err, wcCommand.Path, wcCommand.Args)
 		return
 	}
-	mailStdin.Write("13/3")
+	mailStdin.Write([]byte("1111\n22222\n3333\n4444\n"))
 	mailStdin.Close()
-	bcCommand.Wait()
-	buf, err := bcCommand.Output()
+	buf, err := wcCommand.Output()
 	if err == nil {
-		fmt.Printf("bc execute OK, the result is [%v]\n", buf)
+		fmt.Printf("%v execute OK, the result is [%v]\n", wcCommand.Path, string(buf))
 	} else {
-		fmt.Fprintf(os.Stderr, "The command failed to perform: %s (Command: %s, Arguments: %s)", err, bcCommand.Path, bcCommand.Args)
+		fmt.Fprintf(os.Stderr, "The command failed to perform: %s (Command: %s, Arguments: %s)", err, wcCommand.Path, wcCommand.Args)
 	}
 }
