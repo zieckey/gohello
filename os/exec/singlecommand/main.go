@@ -8,8 +8,7 @@ import (
 
 func main() {
     message := "hello, this is the email body"
-    title := "email title ttt"
-    c := exec.Command("echo", message, "|", "mail", "-s", title, "weizili@360.cn")
+    c := exec.Command("echo", message)
     buf, err := c.Output()
     if err != nil {
         fmt.Fprintf(os.Stderr, "The command failed to perform: %s (Command: %s, Arguments: %s)", err, c.Args)
