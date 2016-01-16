@@ -7,19 +7,25 @@ import (
 	"fmt"
 )
 
-func Query(id, query string) string {
+func Query(r *http.Request) string {
+	id := r.FormValue("id")
+	query := r.FormValue("query")
+
+	//参数合法性检查
+
 	//具体的业务逻辑，查询数据库/NoSQL等数据引擎，然后做逻辑计算，然后合并结果
 	//这里简单抽象，直接返回欢迎语
 	result := fmt.Sprintf("hello, %v", id)
-	log.Printf("<id=%v><query=%v><result=%v>", id, query, result) // 记录一条查询日志，用于离线统计和分析
+
+	// 记录一条查询日志，用于离线统计和分析
+	log.Printf("<id=%v><query=%v><result=%v><ip=%v>", id, query, result, r.RemoteAddr)
+
 	return result
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	id := r.FormValue("id")
-	query := r.FormValue("query")
-	result := Query(id, query)
+	result := Query(r)
 	w.Write([]byte(result))
 }
 
