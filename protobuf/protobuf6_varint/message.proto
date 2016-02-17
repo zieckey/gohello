@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package main;
+
+message M1 {
+    optional int32 i = 1;
+}
+
+message M2 {
+    optional uint32 i = 1;
+}
