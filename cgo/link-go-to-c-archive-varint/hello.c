@@ -14,6 +14,8 @@ int main() {
     int32_t id = 1, row = 2;
     GoInterface gi = {&id, &row};
 
+    //ERROR coredump
+    //TODO Golang not support struct
     GoSlice slice = DocIdEncode(gi);
     printf("DocIdEncode:");
     for (int i = 0; i < slice.len; i++) {

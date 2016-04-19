@@ -1,3 +1,4 @@
+// file hello.go
 package main
 
 import "C"
