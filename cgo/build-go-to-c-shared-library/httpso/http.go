@@ -1,8 +1,8 @@
 package main
 
-import (
-	"C"
+import "C"
 
+import (
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +11,7 @@ import (
 // main is required to build a shared library, but does nothing
 func main() {}
 
-// export StartHTTP
+//export StartHTTP
 func StartHTTP() {
 	http.HandleFunc("/echo", handler)
 	hostname, _ := os.Hostname()

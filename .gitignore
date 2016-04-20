@@ -12,3 +12,4 @@ tools/randfile/*.gz
 tools/randfile/*.txt
 freader/.status.*
 retptr
+retstruct
