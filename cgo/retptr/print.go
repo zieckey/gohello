@@ -1,10 +1,20 @@
 package main
 
 /*
-#cgo CFLAGS: -I .
-#cgo LDFLAGS: -L .
-#include "myprint.h"
 #include <stdlib.h>
+#include <string.h>
+char* retmalloc(int len, int *retlen)
+{
+    static const char* s = "0123456789";
+    char* p = malloc(len);
+    if (len <= strlen(s)) {
+        memcpy(p, s, len);
+    } else {
+        memset(p, 'a', len);
+    }
+    *retlen = len;
+    return p;
+}
 */
 import "C"
 import "unsafe"
@@ -33,10 +43,10 @@ func Prints() {
 
 	*/
 	retlen := C.int(0)
-	len := 5
+	len := 10
 	cstr := C.retmalloc(C.int(len), &retlen)
+	defer C.free(unsafe.Pointer(cstr))
 	gostr := C.GoStringN(cstr, retlen)
 	fmt.Printf("retlen=%v\n", retlen)
 	println(gostr)
-	C.free(unsafe.Pointer(cstr))
 }
