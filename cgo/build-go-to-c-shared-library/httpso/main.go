@@ -1,10 +1,10 @@
 package main
 
 import (
-	//"C"
+	"C"
 
-	"net/http"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -25,6 +25,3 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[%v]", string(buf[0:n]))
 	w.Write(buf[0:n])
 }
-
-
-
