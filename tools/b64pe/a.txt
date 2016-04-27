@@ -1,0 +1,15 @@
+Vibe_Bgs
+u	3腋L7B
+Y@generic
+iostream
+No camera or video input!
+
+ Training vibe model complete!
+d:\vs2012\vc\include\xstring
+d:\opencv\build\include\opencv2\core\mat.hpp
+bungalows.avi
+D:\vs2012\projects\ViBe\Debug\example.pdb
+腿A膌A
+衘A衫A
+opencv_imgproc249d.dll
+< <$<X<\<`<d<h<l<p<
