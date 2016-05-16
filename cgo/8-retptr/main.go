@@ -3,14 +3,7 @@ package main
 /*
 #include <stdlib.h>
 #include <string.h>
-
-struct MyString
-{
-    char* s;
-    int len;
-};
-
-struct MyString xmalloc(int len)
+char* xmalloc(int len, int *rlen)
 {
     static const char* s = "0123456789";
     char* p = malloc(len);
@@ -19,10 +12,8 @@ struct MyString xmalloc(int len)
     } else {
         memset(p, 'a', len);
     }
-    struct MyString str;
-    str.s = p;
-    str.len = len;
-    return str;
+    *rlen = len;
+    return p;
 }
 */
 import "C"
@@ -30,10 +21,11 @@ import "unsafe"
 import "fmt"
 
 func main() {
+	rlen := C.int(0)
 	len := 10
-	str := C.xmalloc(C.int(len))
-	defer C.free(unsafe.Pointer(str.s))
-	gostr := C.GoStringN(str.s, str.len)
-	fmt.Printf("retlen=%v\n", str.len)
+	cstr := C.xmalloc(C.int(len), &rlen)
+	defer C.free(unsafe.Pointer(cstr))
+	gostr := C.GoStringN(cstr, rlen)
+	fmt.Printf("retlen=%v\n", rlen)
 	println(gostr)
 }
