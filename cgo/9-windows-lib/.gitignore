@@ -1,0 +1,3 @@
+pcap/msvc/bin/Release/*.lib
+pcap/msvc/bin/Debug/*.lib
+pcap/msvc/bin/obj/*.*
