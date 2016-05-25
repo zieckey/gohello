@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -14,8 +16,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := 8091
+	if len(os.Args) == 2 {
+		port, _ = strconv.Atoi(os.Args[1])
+	}
 	http.HandleFunc("/echo", handler)
 	hostname, _ := os.Hostname()
-	log.Printf("start http://%s:8091/echo", hostname)
-	log.Fatal(http.ListenAndServe(":8091", nil))
+	log.Printf("start http://%s:%v/echo", hostname, port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }
