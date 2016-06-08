@@ -13,3 +13,8 @@ tools/randfile/*.txt
 freader/.status.*
 retptr
 retstruct
+
+cgo/9-windows-lib/9-windows-lib
+cgo/9-windows-lib/pcap/src/pcap.d
+std/net/httpecho/httpecho
+tools/b64pe/b64pe

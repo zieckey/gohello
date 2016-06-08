@@ -26,7 +26,7 @@ DEPS := $(patsubst %.o, %.d, $(OBJS))
 TARGET_SO=lib$(LIBNAME).so
 TARGET_A=lib$(LIBNAME).a
 
-all : $(TARGET_SO) $(TARGET_A)
+all : $(TARGET_A)
 
 $(TARGET_A) : $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS) 
