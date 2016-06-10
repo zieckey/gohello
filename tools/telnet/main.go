@@ -23,14 +23,14 @@ func recv(conn *net.TCPConn) {
         b := make([]byte, 1024)
         n, err := conn.Read(b)
         if err == nil {
-            fmt.Printf("%v", string(b[0:n]))
+            fmt.Printf("%v\n", string(b[0:n]))
         }
     }
 }
 
 func main() {
     if len(os.Args) != 3 {
-        fmt.Printf("Usage: %v host port\n")
+        fmt.Printf("Usage: %v host port\n", os.Args[0])
         return
     }
 
@@ -53,7 +53,7 @@ func main() {
             continue
         }
 
-        if strings.TrimSpace(s) == "quit" {
+        if s = strings.TrimSpace(s); s == "quit" {
             break
         }
         ch <- s
