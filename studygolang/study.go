@@ -2,7 +2,15 @@ package main
 
 import "github.com/zieckey/gohello/studygolang/pkg"
 import "github.com/zieckey/gohello/studygolang/util"
-import "log"
+import (
+	"log"
+	"strings"
+	"net/url"
+	"io/ioutil"
+	"path/filepath"
+	"os"
+    "sync"
+)
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime)
@@ -49,6 +57,11 @@ func main() {
 	pkg.TestRegexp()
 	pkg.TestGBK2UTF8()
 	pkg.TestPrintf()
+
+	filepath.Clean()
+	filepath.Base()
+	filepath.Dir()
+
 }
 
 /*

@@ -1,0 +1,26 @@
+
+
+
+2016-07-19 11:15:30.3366334 +0800 CST 您的IP是：[218.30.116.7] 来自：北京市北京市 电信 ============> Summary:
+UDP succ:10 fail:0 total:10 rate:1 cost:0.005 220.181.131.229 北京电信
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0388 180.163.222.236 上海电信
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0384 180.97.63.146 南京电信
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0478 59.38.120.28 佛山电信
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0591 218.84.244.33 新疆电信
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0044 111.206.62.178 北京联通
+UDP succ:10 fail:0 total:10 rate:1 cost:0.04 111.161.100.21 天津联通
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0384 221.204.7.202 太原联通
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0485 121.29.1.208 石家庄联通
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0059 101.4.60.83 北京教育网
+UDP succ:10 fail:0 total:10 rate:1 cost:0.0712 119.188.93.107 济南联通
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.0325 220.181.131.229 北京电信
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.0788 180.163.222.236 上海电信
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.097 180.97.63.146 南京电信
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.127 59.38.120.28 佛山电信
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.115 218.84.244.33 新疆电信
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.0219 111.206.62.178 北京联通
+HTTP succ:7 fail:3 total:10 rate:0.7 cost:0.0944 111.161.100.21 天津联通
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.138 221.204.7.202 太原联通
+HTTP succ:6 fail:4 total:10 rate:0.6 cost:0.111 121.29.1.208 石家庄联通
+HTTP succ:10 fail:0 total:10 rate:1 cost:0.0201 101.4.60.83 北京教育网
+HTTP succ:9 fail:1 total:10 rate:0.9 cost:0.129 119.188.93.107 济南联通
