@@ -1,5 +1,7 @@
 package main
 
+import "reflect"
+
 type HandlerFunc func(msg string)
 
 type Module struct {
@@ -23,6 +25,13 @@ func test1() {
 	foo(m.Print, "hello")
 }
 
+func testGetStructName() {
+	m := &Module{}
+	v := reflect.ValueOf(m)
+	println(v.String())
+    println(v.Elem().String())
+}
+
 func testInterfaceConvertToConcreteType() {
 	var a interface{}
 
@@ -44,6 +53,7 @@ func testInterfaceConvertToConcreteType() {
 }
 
 func main() {
+	testGetStructName()
 	test1()
 	testInterfaceConvertToConcreteType()
 }
