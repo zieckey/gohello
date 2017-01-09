@@ -11,12 +11,16 @@ import (
 
 func main() {
 	if len(os.Args) != 3 {
+		fmt.Printf("renameall will rename the file name and the content of file with the specified string.\n", os.Args[0])
 		fmt.Printf("Usage : %v <old-string> <new-string>\n", os.Args[0])
 		fmt.Printf("  e.g.: %v wcpp simcc\n", os.Args[0])
 		return
 	}
 
-	LookupFiles(".", os.Args[1], os.Args[2])
+	// 当碰到文件夹的名称也符合rename条件时， filepath.Walk 一次性可能不能搞定，这里就多重试几次。性能没关系，反正都很快，只要把事情搞定就好。
+	for i := 0; i < 10; i++ {
+		LookupFiles(".", os.Args[1], os.Args[2])
+	}
 }
 
 func LookupFiles(dir string, old, new string) error {
@@ -29,11 +33,22 @@ func LookupFiles(dir string, old, new string) error {
 			return nil
 		}
 
+		if strings.Contains(path, ".svn") {
+			return nil
+		}
+
 		if !f.IsDir() {
 			buf, err := ioutil.ReadFile(path)
 			if err == nil {
-				buf = bytes.Replace(buf, []byte(old), []byte(new), -1)
-				ioutil.WriteFile(path, buf, f.Mode())
+				if bytes.Contains(buf, []byte(old)) {
+					buf = bytes.Replace(buf, []byte(old), []byte(new), -1)
+					err = ioutil.WriteFile(path, buf, f.Mode())
+					if err == nil {
+						fmt.Printf("replace the file content %v OK\n", path)
+					} else {
+						fmt.Printf("replace file content %v failed : %v\n", path, err.Error())
+					}
+				}
 			} else {
 				fmt.Printf("replace file content %v failed : %v\n", path, err.Error())
 			}
