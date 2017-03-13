@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Printf("renameall will rename the file name and the content of file with the specified string.\n", os.Args[0])
+		fmt.Printf("renameall will rename the file name and the content of file with the specified string in current directory.\n")
 		fmt.Printf("Usage : %v <old-string> <new-string>\n", os.Args[0])
 		fmt.Printf("  e.g.: %v wcpp simcc\n", os.Args[0])
 		return
