@@ -24,8 +24,10 @@ func main() {
 	}
 
 	s := string(body)
+	s = strings.Replace(s, "\r\n", "\n", -1)
+	s = strings.Replace(s, "\r", "\n", -1)
 	s = strings.Replace(s, "\n", *new_sep, -1)
 
-	println(s)
+	os.Stdout.WriteString(s)
 }
 
