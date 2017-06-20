@@ -26,7 +26,6 @@ func main() {
 			if lipp != "0.0.0.0:0" {
 				lipp = calcIpPort(lipp, ipIndex, 0)
 			}
-			fmt.Printf("local ip port [%v]\n", lipp)
 			go connect(*serverIpPort, lipp, *messageLen, *sleepIntervalMs)
 		}
 	}
@@ -49,8 +48,11 @@ func connect(serverIpPort string, localIpPort string, messageLen int, sleepInter
 	conn, err := net.DialTCP("tcp", localAddr, serverAddr)
 	if err != nil {
 		println("Dial failed:", err.Error())
-		os.Exit(1)
+		return
 	}
+
+	defer conn.Close()
+	fmt.Printf("Connected to %v OK from %v\n", serverAddr, localAddr)
 
 	reply := make([]byte, 1024*128)
 	message := []byte(strings.Repeat("a", messageLen))
@@ -61,18 +63,17 @@ func connect(serverIpPort string, localIpPort string, messageLen int, sleepInter
 		_, err = conn.Write(message)
 		if err != nil {
 			println("Write to server failed:", err.Error())
-			os.Exit(1)
+			return
 		}
 
 		_, err = conn.Read(reply)
 		if err != nil {
 			println("Write to server failed:", err.Error())
-			os.Exit(1)
+			return
 		}
 
 		time.Sleep(time.Duration(sleepIntervalMs) * time.Millisecond)
 	}
-	conn.Close()
 }
 
 // 根据index计算当前ip的下一个IP
@@ -85,6 +86,5 @@ func calcIpPort(ipPort string, ipIndex int, portIndex int) string {
 	a, _ = strconv.Atoi(string(dotip[3]))
 	next := strconv.Itoa(a + ipIndex)
 	r := dotip[0] + "." + dotip[1] + "." + dotip[2] + "." + next + ":" + port
-	fmt.Printf("input ip=%v index=%v  ===> next ip=%v\n", ipPort, ipIndex, r)
 	return r
 }
