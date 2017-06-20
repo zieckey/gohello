@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"flag"
 	"fmt"
 	"net"
@@ -8,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"bytes"
-	"encoding/binary"
 )
 
 var localIpPort = flag.String("localIpPort", "0.0.0.0:0", "The local ip address and port to bind")
@@ -25,7 +24,7 @@ func main() {
 		for i := 0; i < *connPerIp; i++ {
 			lipp := *localIpPort
 			if lipp != "0.0.0.0:0" {
-				lipp = calcIpPort(lipp, ipIndex, i)
+				lipp = calcIpPort(lipp, ipIndex, 0)
 			}
 			fmt.Printf("local ip port [%v]\n", lipp)
 			go connect(*serverIpPort, lipp, *messageLen, *sleepIntervalMs)
@@ -56,7 +55,7 @@ func connect(serverIpPort string, localIpPort string, messageLen int, sleepInter
 	reply := make([]byte, 1024*128)
 	message := []byte(strings.Repeat("a", messageLen))
 	lenBuff := make([]byte, 4)
-	binary.BigEndian.PutUint32(lenBuff, messageLen)
+	binary.BigEndian.PutUint32(lenBuff, uint32(messageLen))
 	for {
 		_, err = conn.Write(lenBuff)
 		_, err = conn.Write(message)
