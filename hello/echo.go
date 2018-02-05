@@ -11,7 +11,6 @@ func main() {
     fmt.Printf("xx\n")
     log.Printf("xxx")
 
-    var d time.Duration
     t := time.Now()
     t.Unix()
 }
