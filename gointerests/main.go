@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"math"
 	"net/http"
@@ -73,11 +74,11 @@ const htmlTemplate = `
     <h1>复利年化收益率计算器</h1>
     <form method="post">
         <label for="initialAmount">初始金额:</label>
-        <input type="number" id="initialAmount" name="initialAmount" required><br>
+        <input type="number" id="initialAmount" name="initialAmount" value="{{.InitialAmount}}" required><br>
         <label for="finalAmount">终期金额:</label>
-        <input type="number" id="finalAmount" name="finalAmount" required><br>
+        <input type="number" id="finalAmount" name="finalAmount" value="{{.FinalAmount}}" required><br>
         <label for="years">年限:</label>
-        <input type="number" id="years" name="years" required><br>
+        <input type="number" id="years" name="years" value="{{.Years}}" required><br>
         <input type="submit" value="计算">
     </form>
     {{if .Result}}
@@ -87,13 +88,17 @@ const htmlTemplate = `
 </html>
 `
 
-// 定义数据结构
+// 定义数据结构，添加输入值字段
 type CalculatorData struct {
-	Result float64
+	Result         float64
+	InitialAmount  string
+	FinalAmount    string
+	Years          string
 }
 
 // 处理根路径请求
 func handler(w http.ResponseWriter, r *http.Request) {
+	var data CalculatorData
 	if r.Method == http.MethodPost {
 		// 解析表单数据
 		err := r.ParseForm()
@@ -106,6 +111,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		initialAmountStr := r.FormValue("initialAmount")
 		finalAmountStr := r.FormValue("finalAmount")
 		yearsStr := r.FormValue("years")
+
+		// 保存输入值到数据结构
+		data.InitialAmount = initialAmountStr
+		data.FinalAmount = finalAmountStr
+		data.Years = yearsStr
 
 		// 转换为浮点数
 		initialAmount, err := strconv.ParseFloat(initialAmountStr, 64)
@@ -128,24 +138,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		// 计算复利年化收益率
 		rate := (math.Pow(finalAmount/initialAmount, 1/years) - 1) * 100
+		// 格式化结果，保留 4 位小数
+		formattedRate, err := strconv.ParseFloat(fmt.Sprintf("%.4f", rate), 64)
+		if err != nil {
+			http.Error(w, "结果格式化失败", http.StatusInternalServerError)
+			return
+		}
+		data.Result = formattedRate
+	}
 
-		// 渲染模板并输出结果
-		tmpl := template.Must(template.New("calculator").Parse(htmlTemplate))
-		data := CalculatorData{Result: rate}
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "模板渲染失败", http.StatusInternalServerError)
-			return
-		}
-	} else {
-		// 渲染初始模板
-		tmpl := template.Must(template.New("calculator").Parse(htmlTemplate))
-		data := CalculatorData{}
-		err := tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "模板渲染失败", http.StatusInternalServerError)
-			return
-		}
+	// 渲染模板
+	tmpl := template.Must(template.New("calculator").Parse(htmlTemplate))
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "模板渲染失败", http.StatusInternalServerError)
+		return
 	}
 }
 
